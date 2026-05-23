@@ -50,7 +50,7 @@ const SettingsPage = ({
       <div className="max-w-4xl mx-auto px-6 pt-16">
         
         <header className="mb-10">
-          <h1 className="text-4xl font-bold text-[#1A3022] mb-2 font-serif">Pengaturan</h1>
+          <h1 className="type-page-title mb-2">Pengaturan</h1>
           <p className="text-gray-500 text-sm">Kelola akun dan preferensi aplikasi kamu</p>
         </header>
 
@@ -84,7 +84,7 @@ const SettingsPage = ({
 
         {/* Bagian Akun */}
         <div className="space-y-6">
-          <h2 className="text-xl font-bold text-[#1A3022] font-serif px-2">Akun</h2>
+          <h2 className="text-xl font-bold text-[#1A3022] font-heading px-2">Akun</h2>
           <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm p-8">
             <div className="flex justify-between items-center mb-10">
               <div className="flex items-center gap-4">

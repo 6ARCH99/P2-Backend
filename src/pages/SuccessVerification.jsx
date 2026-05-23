@@ -38,7 +38,7 @@ const SuccessVerification = ({ onComplete }) => {
           <div className="w-12 h-12 border-b-4 border-r-4 border-[#1A3022] rotate-45 mb-2 ml-1"></div>
         </div>
 
-        <h1 className="text-5xl font-bold text-[#1A3022] mb-6 font-serif">Verifikasi Berhasil!</h1>
+        <h1 className="text-5xl font-bold text-[#1A3022] mb-6 font-heading">Verifikasi Berhasil!</h1>
         
         <p className="text-gray-500 text-lg max-w-md">
           Akun Tunas kamu sudah aktif. Selamat datang di perjalanan aksi iklim!

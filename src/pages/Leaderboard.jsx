@@ -51,7 +51,7 @@ const Leaderboard = () => {
     <div className="min-h-screen bg-[#F9F7F2] px-6 md:px-20 py-10 font-sans text-[#1A2E35]">
       {/* Header Halaman */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold flex items-center gap-2 font-serif">
+        <h1 className="text-3xl font-bold flex items-center gap-2 font-heading">
           Leaderboard <span className="text-2xl">🏆</span>
         </h1>
         <p className="text-gray-500 text-sm mt-1">Lihat peringkat pengguna terbaik dan raih posisi teratas!</p>
@@ -102,7 +102,7 @@ const Leaderboard = () => {
       {/* Top Champions Podium */}
       <div className="relative bg-[#FFF9ED] rounded-[32px] border border-[#F2E8D5] p-10 mb-12">
         <div className="text-center mb-10">
-          <span className="text-[#D99A29] font-bold text-sm flex items-center justify-center gap-2 font-serif">
+          <span className="text-[#D99A29] font-bold text-sm flex items-center justify-center gap-2 font-heading">
             🏆 Top Champions 🏆
           </span>
         </div>
@@ -146,7 +146,7 @@ const Leaderboard = () => {
 
       {/* List Peringkat 4-10 */}
       <div className="space-y-3">
-        <h4 className="font-bold text-[#1A3022] mb-4 font-serif">Peringkat 4-10</h4>
+        <h4 className="font-bold text-[#1A3022] mb-4 font-heading">Peringkat 4-10</h4>
         {rank4to10.map((item) => (
           <div 
             key={item.userId} 

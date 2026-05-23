@@ -54,7 +54,7 @@ const ImpactPage = () => {
       <div className="max-w-6xl mx-auto px-6 pt-10">
         {/* Header */}
         <header className="mb-10">
-          <h1 className="text-4xl md:text-[2.75rem] font-bold text-[#1A3022] font-serif mb-2 flex items-center gap-2 leading-tight">
+          <h1 className="type-page-title mb-2 flex items-center gap-2">
             Dampak Iklimmu <span aria-hidden>🌍</span>
           </h1>
           <p className="text-gray-500 text-sm md:text-base">
@@ -100,7 +100,7 @@ const ImpactPage = () => {
         <section className="bg-white rounded-[32px] p-8 md:p-10 shadow-sm border border-gray-100 mb-8">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-[#1A3022] font-serif">Trend Kontribusi</h2>
+              <h2 className="text-2xl font-bold text-[#1A3022] font-heading">Trend Kontribusi</h2>
               <p className="text-sm text-gray-400 mt-1">
                 Total sampah terpilah 6 bulan terakhir
               </p>
@@ -129,7 +129,7 @@ const ImpactPage = () => {
                 👥
               </div>
               <div>
-                <h3 className="font-bold text-lg text-[#1A3022] font-serif">
+                <h3 className="font-bold text-lg text-[#1A3022] font-heading">
                   Perbandingan Pengguna
                 </h3>
                 <p className="text-xs text-gray-400">Lihat posisi kamu di komunitas</p>
@@ -190,7 +190,7 @@ const ImpactPage = () => {
                 📤
               </div>
               <div>
-                <h3 className="font-bold text-lg text-[#1A3022] font-serif">
+                <h3 className="font-bold text-lg text-[#1A3022] font-heading">
                   Bagikan Pencapaian
                 </h3>
                 <p className="text-xs text-gray-400">Inspirasi teman-temanmu!</p>

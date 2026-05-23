@@ -110,7 +110,7 @@ const RegisterPage = ({ onBack, onGoToLogin, onContinue, onRegisterSuccess }) =>
         <span className="bg-[#D8E6DC] text-[#2D6A4F] text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest">
           Langkah 1 dari 2
         </span>
-        <h1 className="text-5xl font-bold text-[#1A3022] mt-6 mb-4 font-serif leading-tight">Buat Akun Tunas</h1>
+        <h1 className="text-5xl font-bold text-[#1A3022] mt-6 mb-4 font-heading leading-tight">Buat Akun Tunas</h1>
         <p className="text-gray-500 text-sm">Bergabunglah dengan ribuan pengguna yang sudah bergerak untuk lingkungan</p>
       </div>
 

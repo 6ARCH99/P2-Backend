@@ -96,7 +96,7 @@ const Challenge = () => {
         <span className="text-[10px] font-bold text-orange-400 uppercase tracking-widest bg-orange-50 px-3 py-1 rounded-full">
           Challenge Unggulan
         </span>
-        <h2 className="text-3xl font-bold mt-4 font-serif">{featured?.title ?? '—'}</h2>
+        <h2 className="text-3xl font-bold mt-4 font-heading">{featured?.title ?? '—'}</h2>
         <p className="text-sm text-gray-400 mt-1">
           {featured ? `${featured.joinedCount ?? 0} orang bergabung · ${featuredEndsText}` : '—'}
         </p>
@@ -132,7 +132,7 @@ const Challenge = () => {
 
       {/* Challenge Aktif */}
       <section className="mb-12">
-        <h3 className="text-xl font-bold mb-6 font-serif">Challenge Aktif</h3>
+        <h3 className="text-xl font-bold mb-6 font-heading">Challenge Aktif</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {loading && activeChallenges.length === 0 && (
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-50 h-40 animate-pulse" />
@@ -161,7 +161,7 @@ const Challenge = () => {
 
       {/* Challenge Tersedia (Bagian Baru yang Ditambahkan) */}
       <section className="mb-12">
-        <h3 className="text-xl font-bold mb-6 font-serif">Challenge Tersedia</h3>
+        <h3 className="text-xl font-bold mb-6 font-heading">Challenge Tersedia</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {loading && availableChallenges.length === 0 && (
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-50 h-44 animate-pulse" />
@@ -208,7 +208,7 @@ const Challenge = () => {
         <section>
           <div className="flex items-center gap-2 mb-6">
              <span className="bg-green-100 p-2 rounded-lg text-green-700 text-lg">🏆</span>
-             <h3 className="text-xl font-bold font-serif">Leaderboard</h3>
+             <h3 className="text-xl font-bold font-heading">Leaderboard</h3>
           </div>
           <div className="bg-white rounded-[32px] p-4 shadow-sm border border-gray-50">
             {leaderboard.map((user, idx) => (
@@ -236,7 +236,7 @@ const Challenge = () => {
         <section>
           <div className="flex items-center gap-2 mb-6">
              <span className="bg-green-100 p-2 rounded-lg text-green-700 text-lg">🏅</span>
-             <h3 className="text-xl font-bold font-serif">Badges</h3>
+             <h3 className="text-xl font-bold font-heading">Badges</h3>
           </div>
           <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-50 grid grid-cols-3 gap-6">
             {badges.map((badge) => (

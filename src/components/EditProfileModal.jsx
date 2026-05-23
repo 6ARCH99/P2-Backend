@@ -86,7 +86,7 @@ const EditProfileModal = ({ isOpen, onClose, profile, onSaved }) => {
       >
         <div className="flex items-center justify-between px-8 pt-8 pb-4 border-b border-gray-50">
           <div>
-            <h2 id="edit-profile-title" className="text-2xl font-bold text-[#1A3022] font-serif">
+            <h2 id="edit-profile-title" className="text-2xl font-bold text-[#1A3022] font-heading">
               Edit Profil
             </h2>
             <p className="text-xs text-gray-400 mt-1">Perbarui informasi akun kamu</p>

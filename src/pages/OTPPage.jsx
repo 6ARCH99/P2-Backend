@@ -61,7 +61,7 @@ const OTPPage = ({ onBack, onVerifySuccess, phoneNumber = "+62 812-3456-789" }) 
         <span className="bg-[#D8E6DC] text-[#2D6A4F] text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest">
           Langkah 2 dari 2
         </span>
-        <h1 className="text-5xl font-bold text-[#1A3022] mt-6 mb-4 font-serif leading-tight">Verifikasi OTP</h1>
+        <h1 className="text-5xl font-bold text-[#1A3022] mt-6 mb-4 font-heading leading-tight">Verifikasi OTP</h1>
         <p className="text-gray-500 text-sm">Kami telah mengirimkan kode 6 digit ke</p>
         <p className="font-bold text-[#1A3022] mt-1">{phoneNumber}</p>
       </div>

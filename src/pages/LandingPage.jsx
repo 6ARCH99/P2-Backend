@@ -9,8 +9,8 @@ const FeatureCard = ({ icon, title, desc }) => (
       {icon}
     </div>
     <div>
-      <h4 className="text-lg font-bold text-[#1A3022] mb-2">{title}</h4>
-      <p className="text-gray-400 text-xs leading-relaxed font-medium">{desc}</p>
+      <h4 className="type-section-title text-[#1A3022] mb-2">{title}</h4>
+      <p className="type-caption leading-relaxed">{desc}</p>
     </div>
   </div>
 );
@@ -22,8 +22,8 @@ const StepCard = ({ number, tag, title, desc }) => (
       <span className="text-[#2D6A4F] font-bold text-[10px] uppercase tracking-widest opacity-60 mb-4 block">
         {tag}
       </span>
-      <h4 className="text-2xl font-bold text-[#1A3022] mb-3">{title}</h4>
-      <p className="text-gray-500 text-sm leading-relaxed max-w-[240px]">
+      <h4 className="font-display text-2xl font-semibold text-[#1A3022] mb-3 tracking-tight">{title}</h4>
+      <p className="type-body text-gray-500 leading-relaxed max-w-[240px]">
         {desc}
       </p>
     </div>
@@ -64,12 +64,12 @@ const LandingPage = ({ onLogin, onGoToRegister }) => {
             alt="Logo" 
             className="w-8 h-8 rounded-full object-cover" 
           />
-          <span className="text-xl font-bold text-[#1A3022]">
+          <span className="type-brand text-[#1A3022]">
             Daurin<span className="text-orange-500">.</span>
           </span>
         </div>
         
-        <div className="hidden md:flex gap-10 text-sm font-bold text-gray-500 tracking-wider">
+        <div className="hidden md:flex gap-10 type-nav text-gray-500">
           <a href="#fitur" className="hover:text-[#1A3022] transition-colors uppercase">Fitur</a>
           <a href="#cara-kerja" className="hover:text-[#1A3022] transition-colors uppercase">Cara Kerja</a>
           <a href="#review" className="hover:text-[#1A3022] transition-colors uppercase">Review</a>
@@ -98,11 +98,11 @@ const LandingPage = ({ onLogin, onGoToRegister }) => {
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-8 border border-white/10">
             <span className="text-[10px] font-bold tracking-widest uppercase">🍃 Aksi Iklim Dimulai Hari Ini</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-[1.1]">
+          <h1 className="font-display text-5xl md:text-[4.5rem] font-bold mb-8 leading-[1.08] tracking-tight">
             Pilah Sampah, Dapat <br />
-            <span className="text-[#FFB800] italic font-serif">Reward</span>, Jaga Bumi
+            <span className="text-[#FFB800] italic font-semibold">Reward</span>, Jaga Bumi
           </h1>
-          <p className="text-lg md:text-xl opacity-70 mb-12 max-w-2xl mx-auto leading-relaxed font-medium">
+          <p className="text-base md:text-lg opacity-70 mb-12 max-w-2xl mx-auto leading-relaxed font-normal">
             Jadikan setiap sampah yang kamu pilah sebagai aksi nyata melawan perubahan iklim, dan dapatkan reward langsung ke e-wallet-mu.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-10">
@@ -155,7 +155,7 @@ const LandingPage = ({ onLogin, onGoToRegister }) => {
         <div className="max-w-6xl mx-auto border-2 border-dashed border-blue-200 rounded-[48px] p-8 md:p-16">
           <div className="text-center mb-16">
             <p className="text-[#2D6A4F] font-bold text-[10px] uppercase tracking-[0.2em] mb-3">KENAPA TUNAS?</p>
-            <h2 className="text-4xl md:text-6xl font-bold text-[#1A3022] font-serif">Paling Untung, Paling Mudah</h2>
+            <h2 className="font-display text-4xl md:text-6xl font-semibold text-[#1A3022] tracking-tight">Paling Untung, Paling Mudah</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <FeatureCard icon="💸" title="Rate Tertinggi" desc="Rp 10.000+/kg, 2x lebih tinggi dari bank sampah biasa" />
@@ -173,7 +173,7 @@ const LandingPage = ({ onLogin, onGoToRegister }) => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-20">
             <p className="text-[#2D6A4F] font-bold text-[10px] uppercase tracking-[0.2em] mb-3">CARA KERJANYA</p>
-            <h2 className="text-4xl md:text-6xl font-bold text-[#1A3022] font-serif">Simpel, Cepat, Berdampak</h2>
+            <h2 className="font-display text-4xl md:text-6xl font-semibold text-[#1A3022] tracking-tight">Simpel, Cepat, Berdampak</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <StepCard number="01" tag="MULAI" title="Daftar Gratis" desc="Buat akun dalam hitungan detik. Tidak ada biaya tersembunyi, selamanya gratis." />
@@ -205,7 +205,7 @@ const LandingPage = ({ onLogin, onGoToRegister }) => {
       {/* 8. CTA SECTION */}
       <section className="bg-[#1A3022] py-32 px-6 text-center">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 font-serif leading-tight">
+          <h2 className="font-display text-4xl md:text-6xl font-semibold text-white mb-6 leading-tight tracking-tight">
             Mulai Aksi Iklimmu Hari Ini
           </h2>
           <p className="text-white/60 text-sm md:text-base mb-10 max-w-xl mx-auto font-medium">

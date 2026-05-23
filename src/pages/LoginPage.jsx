@@ -98,7 +98,7 @@ const LoginPage = ({ onBack, onLoginSuccess, onGoToRegister }) => {
         </button>
 
         <div className="flex flex-col items-center">
-          <h2 className="text-4xl font-bold text-[#1A3022] mb-2 font-serif">Selamat Datang Kembali!</h2>
+          <h2 className="text-4xl font-bold text-[#1A3022] mb-2 font-heading">Selamat Datang Kembali!</h2>
           <p className="text-gray-500 text-sm mb-10">Lanjutkan perjalanan aksi iklimmu bersama Daurin</p>
 
           <div className="w-full max-w-md bg-white p-10 rounded-[40px] shadow-xl">

@@ -10,7 +10,7 @@ datasource db {
 model User {
   id              String   @id @default(cuid())
   email           String   @unique
-  passwordHash    String
+  passwordHash    String?
   fullName        String
   phone           String
   address         String
@@ -18,19 +18,126 @@ model User {
   status          String   @default("active")
   rank            String   @default("Bronze")
   memberSince     DateTime @default(now())
-  verified        Boolean  @default(true)
+  verified        Boolean  @default(false)
   totalPoints     Int      @default(0)
   co2SavedKg      Float    @default(0)
   totalWeightKg   Float    @default(0)
   activeDays      Int      @default(0)
+  referralCode    String   @unique
+  referredById    String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  deposits            Deposit[]
-  activities          Activity[]
-  userChallenges      UserChallenge[]
-  userBadges          UserBadge[]
-  pointRedemptions    PointRedemption[]
+  referredBy         User?                @relation("Referrals", fields: [referredById], references: [id])
+  referrals          User[]               @relation("Referrals")
+  deposits           Deposit[]
+  depositTxns        DepositTransaction[]
+  activities         Activity[]
+  userChallenges     UserChallenge[]
+  userBadges         UserBadge[]
+  pointRedemptions   PointRedemption[]
+  pointLedger        PointLedger[]
+  refreshTokens      RefreshToken[]
+  otpCodes           OtpCode[]
+  passwordResets     PasswordResetToken[]
+  oauthAccounts      OAuthAccount[]
+  preferences        UserPreferences?
+  eWallet            EWallet?
+  pickupSchedules    PickupSchedule[]
+  referralEvents     ReferralEvent[]      @relation("Referrer")
+  referredEvents     ReferralEvent[]      @relation("Referee")
+  supportTickets     SupportTicket[]
+  auditLogs          AuditLog[]
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model OtpCode {
+  id        String   @id @default(cuid())
+  userId    String?
+  email     String?
+  phone     String
+  code      String
+  purpose   String   @default("register")
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([phone, purpose])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model OAuthAccount {
+  id         String @id @default(cuid())
+  userId     String
+  provider   String
+  providerId String
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerId])
+}
+
+model UserPreferences {
+  userId               String  @id
+  pushPoints           Boolean @default(true)
+  pushPickup           Boolean @default(true)
+  pushChallenge        Boolean @default(true)
+  pushReward           Boolean @default(true)
+  emailNewsletter      Boolean @default(true)
+  emailPromo           Boolean @default(false)
+  language             String  @default("id")
+  defaultDepositMethod String  @default("pickup")
+  showOnLeaderboard    Boolean @default(true)
+  user                 User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EWallet {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  platform  String
+  phone     String
+  verified  Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DropPoint {
+  id          String   @id @default(cuid())
+  name        String
+  address     String
+  city        String
+  lat         Float
+  lng         Float
+  phone       String?
+  openTime    String
+  closeTime   String
+  rating      Float    @default(4.5)
+  reviewCount Int      @default(0)
+  isOpen      Boolean  @default(true)
+  materials   String
+  createdAt   DateTime @default(now())
+
+  depositTxns DepositTransaction[]
 }
 
 model Deposit {
@@ -45,6 +152,43 @@ model Deposit {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+}
+
+model DepositTransaction {
+  id                String    @id @default(cuid())
+  userId            String
+  dropPointId       String?
+  pickupId          String?   @unique
+  type              String
+  status            String    @default("pending")
+  verificationToken String    @unique
+  totalWeightKg     Float     @default(0)
+  co2SavedKg        Float     @default(0)
+  pointsAwarded     Int       @default(0)
+  categoriesJson    String
+  verifiedAt        DateTime?
+  verifiedBy        String?
+  createdAt         DateTime  @default(now())
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dropPoint         DropPoint? @relation(fields: [dropPointId], references: [id])
+  pickup            PickupSchedule? @relation(fields: [pickupId], references: [id])
+
+  @@index([userId, status])
+}
+
+model PickupSchedule {
+  id              String    @id @default(cuid())
+  userId          String
+  address         String
+  scheduledAt     DateTime
+  estimatedWeightKg Float
+  status          String    @default("scheduled")
+  courierNote     String?
+  actualWeightKg  Float?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  depositTxn      DepositTransaction?
 }
 
 model Activity {
@@ -78,13 +222,13 @@ model Challenge {
 }
 
 model UserChallenge {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
   challengeId String
-  progress    Float    @default(0)
-  status      String   @default("active")
-  joinedAt    DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  progress    Float     @default(0)
+  status      String    @default("active")
+  joinedAt    DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
 
   @@unique([userId, challengeId])
@@ -113,11 +257,77 @@ model UserBadge {
 }
 
 model PointRedemption {
+  id           String   @id @default(cuid())
+  userId       String
+  platform     String
+  amountRp     Int
+  points       Int
+  status       String   @default("pending")
+  externalRef  String?
+  failReason   String?
+  createdAt    DateTime @default(now())
+  completedAt  DateTime?
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PointLedger {
+  id           String   @id @default(cuid())
+  userId       String
+  amount       Int
+  balanceAfter Int
+  type         String
+  referenceId  String?
+  description  String
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model ReferralEvent {
+  id          String   @id @default(cuid())
+  referrerId  String
+  refereeId   String   @unique
+  bonusPoints Int      @default(100)
+  createdAt   DateTime @default(now())
+  referrer    User     @relation("Referrer", fields: [referrerId], references: [id])
+  referee     User     @relation("Referee", fields: [refereeId], references: [id])
+}
+
+model Faq {
+  id       String @id @default(cuid())
+  question String
+  answer   String
+  keywords String
+  category String @default("general")
+}
+
+model SupportTicket {
   id        String   @id @default(cuid())
   userId    String
-  platform  String
-  amountRp  Int
-  points    Int
+  subject   String
+  message   String
+  status    String   @default("open")
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  resource  String
+  metadata  String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model NotificationQueue {
+  id        String   @id @default(cuid())
+  userId    String
+  channel   String
+  event     String
+  payload   String
+  sent      Boolean  @default(false)
+  createdAt DateTime @default(now())
 }

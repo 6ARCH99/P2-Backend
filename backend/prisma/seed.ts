@@ -5,13 +5,28 @@ import { co2FromWeightKg, pointsFromDeposit } from "../src/lib/climate.js";
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.notificationQueue.deleteMany();
+  await prisma.auditLog.deleteMany();
+  await prisma.supportTicket.deleteMany();
+  await prisma.faq.deleteMany();
+  await prisma.referralEvent.deleteMany();
+  await prisma.pointLedger.deleteMany();
   await prisma.pointRedemption.deleteMany();
+  await prisma.depositTransaction.deleteMany();
+  await prisma.pickupSchedule.deleteMany();
   await prisma.activity.deleteMany();
   await prisma.userBadge.deleteMany();
   await prisma.userChallenge.deleteMany();
   await prisma.deposit.deleteMany();
   await prisma.challenge.deleteMany();
   await prisma.badge.deleteMany();
+  await prisma.dropPoint.deleteMany();
+  await prisma.eWallet.deleteMany();
+  await prisma.userPreferences.deleteMany();
+  await prisma.oAuthAccount.deleteMany();
+  await prisma.passwordResetToken.deleteMany();
+  await prisma.otpCode.deleteMany();
+  await prisma.refreshToken.deleteMany();
   await prisma.user.deleteMany();
 
   const passwordHash = await bcrypt.hash("password123", 10);
@@ -27,7 +42,16 @@ async function main() {
       rank: "Top 12% Contributor",
       memberSince: new Date("2026-01-15"),
       verified: true,
+      referralCode: "PUTRA24",
       totalPoints: 12450,
+      preferences: { create: {} },
+      eWallet: {
+        create: {
+          platform: "gopay",
+          phone: "08123456789",
+          verified: true,
+        },
+      },
       co2SavedKg: 127.5,
       totalWeightKg: 145,
       activeDays: 89,
@@ -50,8 +74,10 @@ async function main() {
         passwordHash,
         phone: "08120000000",
         address: "Jakarta",
+        referralCode: p.email.split("@")[0].toUpperCase().slice(0, 8) + "01",
         co2SavedKg: co2FromWeightKg(p.totalWeightKg),
         activeDays: 60,
+        preferences: { create: {} },
       },
     });
     peerUsers.push(u);
@@ -314,8 +340,77 @@ async function main() {
     ],
   });
 
+  const dropPoints = [
+    {
+      name: "Drop Point Sudirman Central",
+      address: "Jl. Jenderal Sudirman No. 52-53, Jakarta Pusat",
+      city: "Jakarta Pusat",
+      lat: -6.2088,
+      lng: 106.8456,
+      phone: "+62 21 5789 1234",
+      openTime: "07:00",
+      closeTime: "20:00",
+      rating: 4.8,
+      reviewCount: 127,
+      materials: JSON.stringify(["Plastik", "Kertas", "Logam", "Elektronik"]),
+    },
+    {
+      name: "Bank Sampah Melati Bersih",
+      address: "Jl. Melati Raya No. 15, Kebayoran Baru",
+      city: "Jakarta Selatan",
+      lat: -6.2441,
+      lng: 106.7992,
+      phone: "+62 21 7234 5678",
+      openTime: "08:00",
+      closeTime: "17:00",
+      rating: 4.6,
+      reviewCount: 89,
+      materials: JSON.stringify(["Plastik", "Kertas", "Kaca"]),
+    },
+    {
+      name: "DP Senayan Park",
+      address: "Taman Senayan, Gelora Bung Karno",
+      city: "Jakarta Pusat",
+      lat: -6.2185,
+      lng: 106.8028,
+      openTime: "06:00",
+      closeTime: "18:00",
+      rating: 4.9,
+      reviewCount: 203,
+      materials: JSON.stringify(["Plastik", "Kertas", "Logam", "Kaca"]),
+    },
+  ];
+
+  for (const dp of dropPoints) {
+    await prisma.dropPoint.create({ data: dp });
+  }
+
+  await prisma.faq.createMany({
+    data: [
+      {
+        question: "Bagaimana cara mendapatkan poin?",
+        answer: "Setor sampah terpilah di drop point atau jadwalkan penjemputan. Poin diberikan setelah setor diverifikasi operator.",
+        keywords: "poin,setor,reward",
+        category: "reward",
+      },
+      {
+        question: "Berapa lama jadwal penjemputan sampah?",
+        answer: "Penjemputan biasanya dilakukan dalam jendela 2 jam sesuai jadwal yang Anda pilih.",
+        keywords: "penjemputan,jadwal",
+        category: "pickup",
+      },
+      {
+        question: "Apakah bisa menukar poin dengan uang?",
+        answer: "Ya, poin dapat ditukar ke GoPay, OVO, Dana, atau ShopeePay melalui Reward Centre.",
+        keywords: "tukar,uang,ewallet",
+        category: "reward",
+      },
+    ],
+  });
+
   console.log("Seed complete.");
   console.log("Demo login: putra.wijaya@email.com / password123");
+  console.log("Referral code: PUTRA24 | Operator key: operator-dev-key");
 }
 
 main()

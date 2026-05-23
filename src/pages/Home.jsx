@@ -57,14 +57,14 @@ const Home = ({ user }) => {
   const showMetrics = !loading && dashboard;
 
   return (
-    <div className="min-h-screen bg-[#F5F5F0] p-4 md:p-8 font-sans">
-      <div className="max-w-6xl mx-auto">
-        <main className="pt-4">
-          <div className="mb-10">
-            <h1 className="text-4xl font-bold text-[#1A3022] font-serif mb-2">
+    <div className="app-page">
+      <div className="app-page-inner max-w-6xl">
+        <main>
+          <div className="app-page-header">
+            <h1 className="type-page-title mb-2">
               Selamat Datang, {userName}! 👋
             </h1>
-            <p className="text-gray-500 text-sm">
+            <p className="type-page-subtitle">
               Terus semangat jaga lingkungan. Kamu sudah berkontribusi banyak!
             </p>
             <ApiStatusBanner error={error} loading={loading} />
@@ -72,7 +72,7 @@ const Home = ({ user }) => {
               <button
                 type="button"
                 onClick={loadDashboard}
-                className="mt-2 text-xs font-bold text-[#1A3022] underline hover:no-underline"
+                className="mt-2 type-ui-sm text-[#1A3022] underline hover:no-underline"
               >
                 Coba muat ulang
               </button>
@@ -128,12 +128,12 @@ const Home = ({ user }) => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             <div className="lg:col-span-2 bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
-              <h3 className="font-bold text-[#1A3022] mb-8 font-serif">Aktivitas Setor — 7 Hari Terakhir</h3>
+              <h3 className="type-section-title mb-8">Aktivitas Setor — 7 Hari Terakhir</h3>
               {loading ? (
                 <div className="h-56 bg-gray-50 rounded-2xl animate-pulse" />
               ) : chart.length > 0 && chart.some(d => d.depositCount > 0) ? (
                 <div className="flex gap-4 h-56">
-                  <div className="w-8 flex flex-col justify-between text-[10px] font-bold text-gray-300 pb-8">
+                  <div className="w-8 flex flex-col justify-between type-caption-bold text-gray-300 pb-8">
                     {[...ticks].reverse().map((t) => (
                       <span key={t}>{Math.round(t)}</span>
                     ))}
@@ -154,19 +154,19 @@ const Home = ({ user }) => {
                               minHeight: day.depositCount ? '8%' : '4%',
                             }}
                           />
-                          <span className="text-[10px] font-bold text-gray-400 uppercase">{day.label}</span>
+                          <span className="type-caption-bold text-gray-400 uppercase">{day.label}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-gray-400 text-center py-16">Belum ada data setor minggu ini.</p>
+                <p className="type-body text-gray-400 text-center py-16">Belum ada data setor minggu ini.</p>
               )}
             </div>
 
             <div className="bg-[#1A3022] p-8 rounded-[32px] text-white shadow-xl">
-              <h3 className="font-bold mb-6 font-serif text-lg">Aksi Cepat</h3>
+              <h3 className="type-section-title text-white mb-6">Aksi Cepat</h3>
               <div className="space-y-4">
                 <div
                   onClick={() => navigate('/drop-point')}
@@ -174,8 +174,8 @@ const Home = ({ user }) => {
                 >
                   <span className="text-2xl">📍</span>
                   <div className="text-left">
-                    <p className="text-sm font-bold">Cari Drop Point</p>
-                    <p className="text-[10px] opacity-60">Terdekat dari lokasimu</p>
+                    <p className="type-ui-sm text-white">Cari Drop Point</p>
+                    <p className="type-caption text-white/60">Terdekat dari lokasimu</p>
                   </div>
                 </div>
                 <div
@@ -184,8 +184,8 @@ const Home = ({ user }) => {
                 >
                   <span className="text-2xl">📅</span>
                   <div className="text-left">
-                    <p className="text-sm font-bold">Jadwalkan Penjemputan</p>
-                    <p className="text-[10px] opacity-60">Gratis langsung ke rumah</p>
+                    <p className="type-ui-sm text-white">Jadwalkan Penjemputan</p>
+                    <p className="type-caption text-white/60">Gratis langsung ke rumah</p>
                   </div>
                 </div>
                 <div
@@ -194,8 +194,8 @@ const Home = ({ user }) => {
                 >
                   <span className="text-2xl">💰</span>
                   <div className="text-left">
-                    <p className="text-sm font-bold">Tukar Poin</p>
-                    <p className="text-[10px] font-bold opacity-80">Ke GoPay, OVO, Dana</p>
+                    <p className="type-ui-sm text-[#1A3022]">Tukar Poin</p>
+                    <p className="type-caption-bold text-[#1A3022]/80">Ke GoPay, OVO, Dana</p>
                   </div>
                 </div>
               </div>
@@ -204,7 +204,7 @@ const Home = ({ user }) => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
-              <h3 className="font-bold text-[#1A3022] mb-6 font-serif">Challenge Aktif</h3>
+              <h3 className="type-section-title mb-6">Challenge Aktif</h3>
               <div className="space-y-4">
                 {loading && <p className="text-sm text-gray-400">Memuat…</p>}
                 {!loading && challenges.length === 0 && (
@@ -213,7 +213,7 @@ const Home = ({ user }) => {
                 {challenges.map((c) => (
                   <div key={c.id} className="p-4 bg-[#F9F9F6] rounded-2xl border border-gray-50">
                     <div className="flex justify-between items-center mb-2">
-                      <p className="text-sm font-bold text-[#2D4A37]">{c.title}</p>
+                      <p className="type-ui-sm text-[#2D4A37]">{c.title}</p>
                       <span className="text-xs text-gray-400">🎯</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
@@ -222,7 +222,7 @@ const Home = ({ user }) => {
                         style={{ width: `${c.progressPercent}%` }}
                       />
                     </div>
-                    <p className="text-[10px] text-gray-500 font-bold">
+                    <p className="type-caption-bold text-gray-500">
                       {c.progress} / {c.target} {c.unit} ({c.progressPercent}%)
                     </p>
                   </div>
@@ -232,11 +232,11 @@ const Home = ({ user }) => {
 
             <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="font-bold text-[#1A3022] font-serif">Aktivitas Terakhir</h3>
+                <h3 className="type-section-title">Aktivitas Terakhir</h3>
                 <button
                   type="button"
                   onClick={() => navigate('/profile')}
-                  className="text-xs font-bold text-[#2D4A37] hover:underline"
+                  className="type-ui-sm text-[#2D4A37] hover:underline"
                 >
                   Lihat Semua
                 </button>
@@ -258,11 +258,11 @@ const Home = ({ user }) => {
                           {icon}
                         </div>
                         <div>
-                          <p className="text-xs font-bold text-[#1A3022]">{act.title}</p>
-                          <p className="text-[10px] text-gray-400">{act.description}</p>
+                          <p className="type-ui-sm text-[#1A3022]">{act.title}</p>
+                          <p className="type-caption text-gray-400">{act.description}</p>
                         </div>
                       </div>
-                      <span className={`text-xs font-black ${minus ? 'text-red-500' : 'text-[#2D4A37]'}`}>
+                      <span className={`type-ui-sm font-bold ${minus ? 'text-red-500' : 'text-[#2D4A37]'}`}>
                         {act.pointsDelta > 0 ? '+' : ''}
                         {act.pointsDelta} poin
                       </span>

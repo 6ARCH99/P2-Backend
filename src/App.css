@@ -13,8 +13,6 @@ html, body, #root {
   height: 100%;
 }
 
-/* FONT */
 body {
-  font-family: system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
 }

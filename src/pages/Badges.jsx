@@ -49,7 +49,7 @@ const Badges = () => {
     <div className="min-h-screen bg-[#F9F7F2] px-6 md:px-20 py-10 font-sans text-[#1A2E35]">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold flex items-center gap-2 font-serif">
+        <h1 className="text-3xl font-bold flex items-center gap-2 font-heading">
           Badges <span className="text-2xl">🎖️</span>
         </h1>
         <p className="text-gray-500 text-sm mt-1">Kumpulkan badge dan tunjukkan pencapaianmu!</p>
@@ -87,7 +87,7 @@ const Badges = () => {
       {/* Badge Terkumpul Section */}
       <section className="mb-12">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-bold font-serif flex items-center gap-2">
+          <h2 className="text-lg font-bold font-heading flex items-center gap-2">
             Badge Terkumpul <span className="text-sm">✨</span>
           </h2>
           <span className="text-[10px] font-bold px-3 py-1 bg-green-100 text-green-700 rounded-full">
@@ -127,7 +127,7 @@ const Badges = () => {
       {/* Badge Terkunci Section */}
       <section className="mb-12">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-bold font-serif flex items-center gap-2">
+          <h2 className="text-lg font-bold font-heading flex items-center gap-2">
             Badge Terkunci <span className="text-sm">🔒</span>
           </h2>
           <span className="text-[10px] font-bold text-gray-400">

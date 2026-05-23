@@ -1,170 +1,347 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Gift, LineChart, Users, Lightbulb } from 'lucide-react';
 import RewardCard from '../components/RewardCard';
+import RewardPlatformPicker from '../components/reward/RewardPlatformPicker';
+import RewardEwalletForm from '../components/reward/RewardEwalletForm';
+import { api } from '../services/api';
+
+const TIERS = [
+  { amount: 'Rp 5,000', amountRp: 5000, points: 500 },
+  { amount: 'Rp 10,000', amountRp: 10000, points: 1000 },
+  { amount: 'Rp 25,000', amountRp: 25000, points: 2500 },
+  { amount: 'Rp 50,000', amountRp: 50000, points: 5000 },
+];
+
+const TIPS = [
+  'Setor sampah rutin setiap minggu',
+  'Ikuti challenge mingguan',
+  'Ajak teman bergabung',
+  'Pilah dengan benar untuk bonus poin',
+];
+
+const TABS = [
+  { id: 'tukar', label: 'TUKAR', Icon: Gift },
+  { id: 'riwayat', label: 'RIWAYAT', Icon: LineChart },
+  { id: 'referral', label: 'REFERRAL', Icon: Users },
+];
+
+function formatDate(iso) {
+  return new Date(iso).toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+const RewardSidebar = () => (
+  <div className="space-y-5">
+    <div className="bg-[#FDFBF0] p-7 rounded-[24px] border-2 border-[#EBA332]/40">
+      <h3 className="font-sans text-sm font-semibold text-[#1A3022] mb-4 flex items-center gap-2">
+        <Lightbulb className="w-4 h-4 text-[#EBA332]" strokeWidth={2} />
+        Tips Kumpulkan Poin
+      </h3>
+      <ul className="font-sans text-xs font-normal text-[#1A3022]/80 space-y-3 leading-relaxed">
+        {TIPS.map((tip) => (
+          <li key={tip}>• {tip}</li>
+        ))}
+      </ul>
+    </div>
+    <div className="bg-[#D8E6DC] p-7 rounded-[24px]">
+      <h3 className="font-display text-lg font-semibold text-[#1A3022] mb-2 tracking-tight">Poin = Uang Nyata</h3>
+      <p className="font-sans text-sm font-semibold text-[#2D6A4F] mb-2">1 poin = Rp 10</p>
+      <p className="font-sans text-xs font-normal text-[#1A3022]/70 leading-relaxed">
+        Proses pencairan 1x24 jam ke e-wallet pilihanmu
+      </p>
+    </div>
+  </div>
+);
 
 const Reward = () => {
   const [activeTab, setActiveTab] = useState('tukar');
+  const [balance, setBalance] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [referral, setReferral] = useState(null);
+  const [wallet, setWallet] = useState(null);
+  const [platform, setPlatform] = useState('gopay');
+  const [loading, setLoading] = useState(true);
+  const [redeeming, setRedeeming] = useState(false);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
 
-  const historyData = [
-    { title: 'Setor Sampah', date: '28 Mar 2026', points: '+450', type: 'in' },
-    { title: 'Tukar ke GoPay', date: '25 Mar 2026', points: '-2000', type: 'out' },
-    { title: 'Bonus Referral', date: '22 Mar 2026', points: '+500', type: 'in' },
-    { title: 'Setor Sampah', date: '20 Mar 2026', points: '+380', type: 'in' },
-  ];
+  const loadBalance = useCallback(async () => {
+    const { data } = await api.getRewardBalance();
+    setBalance(data);
+  }, []);
+
+  const loadAll = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      await loadBalance();
+      const [histRes, refRes, walletRes] = await Promise.all([
+        api.getRewardHistory(),
+        api.getReferralStats(),
+        api.getEwallet(),
+      ]);
+      setHistory(histRes.data || []);
+      setReferral(refRes.data);
+      setWallet(walletRes.data);
+      if (walletRes.data?.platform) setPlatform(walletRes.data.platform);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [loadBalance]);
+
+  useEffect(() => {
+    loadAll();
+  }, [loadAll]);
+
+  const available = balance?.available ?? 0;
+
+  const handleRedeem = async (tier) => {
+    if (!wallet?.verified) {
+      setError('Simpan nomor e-wallet terlebih dahulu.');
+      return;
+    }
+    setRedeeming(true);
+    setError('');
+    setMessage('');
+    try {
+      const res = await api.redeemPoints(platform, tier.amountRp);
+      setMessage(`Penukaran diproses. Poin: -${res.data.pointsDeducted}`);
+      await loadAll();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setRedeeming(false);
+    }
+  };
+
+  const copyCode = () => {
+    if (referral?.code) navigator.clipboard?.writeText(referral.code);
+    setMessage('Kode disalin!');
+  };
+
+  const shareCode = () => {
+    const text = `Gabung Daurin dengan kode ${referral?.code || ''}`;
+    if (navigator.share) navigator.share({ title: 'Daurin', text }).catch(() => {});
+    else {
+      navigator.clipboard?.writeText(text);
+      setMessage('Teks bagikan disalin!');
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-tunas-bg p-4 md:p-8 font-sans">
-      <div className="max-w-6xl mx-auto bg-tunas-light rounded-[40px] shadow-sm overflow-hidden border border-gray-200/50">
-        
-        <main className="p-6 md:p-10">
-          {/* Header Poin - Statis */}
-          <div className="bg-tunas-dark rounded-[32px] p-8 text-white mb-10 shadow-xl shadow-tunas-dark/10">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+    <div className="app-page">
+      <div className="app-page-inner max-w-6xl">
+        {error && (
+          <p className="mb-4 font-sans text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+            {error}
+          </p>
+        )}
+        {message && (
+          <p className="mb-4 font-sans text-sm text-green-700 bg-green-50 border border-green-100 rounded-xl px-4 py-3">
+            {message}
+          </p>
+        )}
+
+        {/* Hero */}
+        <div className="bg-[#1A3022] rounded-[24px] p-8 md:p-10 text-white mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+            <div>
+              <p className="font-sans text-[10px] font-bold uppercase tracking-[0.12em] text-white/60 mb-3">
+                REWARD CENTRE
+              </p>
+              <p className="font-display text-[3.5rem] md:text-[3.75rem] font-bold leading-none tracking-tight text-white">
+                {loading ? '…' : available.toLocaleString('id-ID')}
+              </p>
+              <p className="font-sans text-sm font-normal text-white/75 mt-2">Poin tersedia</p>
+            </div>
+            <div className="flex gap-10 lg:gap-14 lg:border-l lg:border-white/15 lg:pl-10">
               <div>
-                <p className="text-[10px] font-bold opacity-60 tracking-widest uppercase mb-2">REWARD CENTRE</p>
-                <div className="flex items-baseline gap-2">
-                  <h1 className="text-6xl font-bold">2,450</h1>
-                  <span className="text-sm opacity-80">Poin tersedia</span>
-                </div>
+                <p className="font-sans text-[10px] font-bold uppercase tracking-[0.12em] text-white/60 mb-2">
+                  POIN MASUK
+                </p>
+                <p className="font-display text-3xl md:text-4xl font-bold tracking-tight text-white">
+                  {(balance?.totalEarned ?? 0).toLocaleString('id-ID')}
+                </p>
               </div>
-              <div className="flex gap-8 border-l border-white/10 pl-8">
-                <div>
-                  <p className="text-[10px] opacity-60 font-bold mb-1 uppercase">Poin Masuk</p>
-                  <p className="text-xl font-bold">12,450</p>
-                </div>
-                <div>
-                  <p className="text-[10px] opacity-60 font-bold mb-1 uppercase">Poin Terpakai</p>
-                  <p className="text-xl font-bold">10,000</p>
-                </div>
-              </div>
-            </div>
-            <div className="mt-10">
-              <div className="flex justify-between text-[11px] font-bold mb-3">
-                <p>Butuh 50 poin lagi untuk reward Rp 25,000</p>
-                <p>98%</p>
-              </div>
-              <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden">
-                <div className="bg-tunas-orange h-full w-[98%] rounded-full transition-all duration-500"></div>
+              <div>
+                <p className="font-sans text-[10px] font-bold uppercase tracking-[0.12em] text-white/60 mb-2">
+                  POIN TERPAKAI
+                </p>
+                <p className="font-display text-3xl md:text-4xl font-bold tracking-tight text-white">
+                  {(balance?.totalSpent ?? 0).toLocaleString('id-ID')}
+                </p>
               </div>
             </div>
           </div>
+          {balance?.nextReward && (
+            <div className="mt-8 pt-2">
+              <p className="font-sans text-xs font-medium text-white/90 mb-3">
+                Butuh {balance.nextReward.pointsNeeded} poin lagi untuk reward Rp{' '}
+                {balance.nextReward.nextAmountRp.toLocaleString('id-ID')}
+              </p>
+              <div className="w-full bg-white/15 h-2.5 rounded-full overflow-hidden">
+                <div
+                  className="bg-[#A8D5BA] h-full rounded-full transition-all duration-500"
+                  style={{ width: `${balance.nextReward.progressPercent}%` }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
 
-          {/* Menu Navigasi Tab */}
-          <div className="flex flex-wrap gap-4 mb-10">
-            {[
-              { id: 'tukar', label: 'Tukar', icon: '💰' },
-              { id: 'riwayat', label: 'Riwayat', icon: '⏳' },
-              { id: 'referral', label: 'Referral', icon: '👥' }
-            ].map((tab) => (
-              <button 
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-8 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 transition-all border shadow-sm ${
-                  activeTab === tab.id 
-                  ? 'bg-tunas-dark text-white border-tunas-dark' 
-                  : 'bg-white text-tunas-dark border-gray-100 hover:bg-gray-50'
-                }`}
-              >
-                {tab.icon} {tab.label}
-              </button>
-            ))}
-          </div>
+        {/* Tabs */}
+        <div className="flex flex-wrap gap-3 mb-8">
+          {TABS.map(({ id, label, Icon }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setActiveTab(id)}
+              className={`px-6 py-3 rounded-2xl font-sans text-xs font-bold uppercase tracking-wide flex items-center gap-2 border transition-all ${
+                activeTab === id
+                  ? 'bg-[#1A3022] text-white border-[#1A3022] shadow-sm'
+                  : 'bg-white text-[#1A3022] border-gray-100 hover:bg-gray-50'
+              }`}
+            >
+              <Icon className="w-4 h-4" strokeWidth={2.5} />
+              {label}
+            </button>
+          ))}
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-            <div className="lg:col-span-2 min-h-[400px]">
-              
-              {/* CONTENT: TUKAR */}
-              {activeTab === 'tukar' && (
-                <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-tunas-dark mb-2">Tukar Poin ke E-Wallet</h2>
-                    <p className="text-gray-400 text-sm">Pilih platform e-wallet favoritmu</p>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <RewardCard amount="Rp 5,000" points="500" />
-                    <RewardCard amount="Rp 10,000" points="1,000" />
-                    <RewardCard amount="Rp 25,000" points="2,500" isLocked />
-                    <RewardCard amount="Rp 50,000" points="5,000" isLocked />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
+          <div className="lg:col-span-2 space-y-8">
+            {activeTab === 'tukar' && (
+              <>
+                <div>
+                  <h2 className="font-display text-2xl font-semibold text-[#1A3022] tracking-tight mb-2">
+                    Tukar Poin ke E-Wallet
+                  </h2>
+                  <p className="font-sans text-sm font-normal text-gray-500">
+                    Pilih platform e-wallet favoritmu dan tukar poin menjadi saldo nyata
+                  </p>
+                </div>
+
+                <RewardPlatformPicker value={platform} onChange={setPlatform} />
+
+                <div>
+                  <h3 className="font-display text-lg font-semibold text-[#1A3022] tracking-tight mb-4">
+                    Pilih Nominal
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {TIERS.map((tier) => (
+                      <RewardCard
+                        key={tier.amountRp}
+                        amount={tier.amount}
+                        points={tier.points.toLocaleString('id-ID')}
+                        isLocked={available < tier.points}
+                        loading={redeeming}
+                        onRedeem={() => handleRedeem(tier)}
+                      />
+                    ))}
                   </div>
                 </div>
-              )}
 
-              {/* CONTENT: RIWAYAT */}
-              {activeTab === 'riwayat' && (
-                <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  <h2 className="text-2xl font-bold text-tunas-dark mb-6">Riwayat Penukaran Poin</h2>
-                  <div className="space-y-4">
-                    {historyData.map((item, index) => (
-                      <div key={index} className="bg-white p-5 rounded-2xl border border-gray-100 flex justify-between items-center shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-center gap-4">
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl ${item.type === 'in' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'}`}>
-                            {item.type === 'in' ? '📈' : '📉'}
-                          </div>
-                          <div>
-                            <p className="font-bold text-sm text-tunas-dark">{item.title}</p>
-                            <p className="text-[10px] text-gray-400 font-medium">{item.date}</p>
-                          </div>
-                        </div>
-                        <p className={`font-bold text-base ${item.type === 'in' ? 'text-tunas-green' : 'text-orange-500'}`}>
-                          {item.points}
+                <RewardEwalletForm
+                  platform={platform}
+                  onPlatformChange={setPlatform}
+                  wallet={wallet}
+                  onSaved={loadAll}
+                />
+              </>
+            )}
+
+            {activeTab === 'riwayat' && (
+              <div>
+                <h2 className="font-display text-2xl font-semibold text-[#1A3022] tracking-tight mb-6">
+                  Riwayat Penukaran Poin
+                </h2>
+                {history.length === 0 && !loading && (
+                  <p className="font-sans text-sm text-gray-400">Belum ada riwayat.</p>
+                )}
+                <div className="space-y-3">
+                  {history.map((item) => (
+                    <div
+                      key={item.id}
+                      className="bg-white p-5 rounded-2xl border border-gray-100 flex justify-between items-center"
+                    >
+                      <div>
+                        <p className="font-sans text-sm font-semibold text-[#1A3022]">{item.description}</p>
+                        <p className="font-sans text-xs font-normal text-gray-400 mt-0.5">
+                          {formatDate(item.createdAt)}
                         </p>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* CONTENT: REFERRAL */}
-              {activeTab === 'referral' && (
-                <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 text-center sm:text-left">
-                  <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-tunas-dark mb-2">Ajak Teman, Dapat Bonus! 🎁</h2>
-                    <p className="text-gray-400 text-sm">Bagikan kodemu dan dapatkan bonus poin instan.</p>
-                  </div>
-                  
-                  <div className="bg-white rounded-[32px] border border-gray-100 p-10 text-center mb-8 shadow-sm">
-                    <p className="text-[10px] font-bold text-gray-400 tracking-widest uppercase mb-4">Kode Unikmu</p>
-                    <h3 className="text-5xl font-black text-tunas-dark mb-8 tracking-tighter">PUTRA24</h3>
-                    <div className="flex flex-col sm:flex-row justify-center gap-3">
-                      <button className="bg-tunas-dark text-white px-10 py-3 rounded-2xl text-xs font-bold hover:opacity-90 transition-all">Salin Kode</button>
-                      <button className="bg-gray-50 text-tunas-dark px-10 py-3 rounded-2xl text-xs font-bold border border-gray-100 hover:bg-gray-100 transition-all">Bagikan</button>
+                      <p
+                        className={`font-sans text-sm font-bold ${
+                          item.amount > 0 ? 'text-[#2D6A4F]' : 'text-[#EBA332]'
+                        }`}
+                      >
+                        {item.amount > 0 ? '+' : ''}
+                        {item.amount}
+                      </p>
                     </div>
-                  </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-                  <div className="grid grid-cols-3 gap-4">
-                    {[
-                      { val: '12', label: 'Diajak' },
-                      { val: '8', label: 'Gabung' },
-                      { val: '800', label: 'Poin' }
-                    ].map(stat => (
-                      <div key={stat.label} className="bg-tunas-green/10 border border-tunas-green/20 p-4 rounded-2xl">
-                        <p className="text-xl font-black text-tunas-dark">{stat.val}</p>
-                        <p className="text-[9px] font-bold text-tunas-green uppercase">{stat.label}</p>
-                      </div>
-                    ))}
+            {activeTab === 'referral' && (
+              <div>
+                <h2 className="font-display text-2xl font-semibold text-[#1A3022] tracking-tight mb-2">
+                  Ajak Teman, Dapat Bonus! 🎁
+                </h2>
+                <p className="font-sans text-sm font-normal text-gray-500 mb-8">
+                  Setiap teman yang bergabung dan setor pertama kali, kalian berdua langsung dapat +100 poin.
+                </p>
+                <div className="bg-white rounded-[24px] border border-gray-100 p-10 text-center mb-6 shadow-sm">
+                  <p className="font-sans text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-4">
+                    Kode Unikmu
+                  </p>
+                  <p className="font-display text-5xl font-bold text-[#1A3022] tracking-tight mb-8">
+                    {referral?.code || '—'}
+                  </p>
+                  <div className="flex flex-col sm:flex-row justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={copyCode}
+                      className="bg-[#1A3022] text-white px-10 py-3 rounded-2xl font-sans text-xs font-semibold"
+                    >
+                      Salin Kode
+                    </button>
+                    <button
+                      type="button"
+                      onClick={shareCode}
+                      className="bg-gray-50 text-[#1A3022] px-10 py-3 rounded-2xl font-sans text-xs font-semibold border border-gray-100"
+                    >
+                      Bagikan
+                    </button>
                   </div>
                 </div>
-              )}
-            </div>
-
-            {/* Sidebar (Statis) */}
-            <div className="space-y-6">
-              <div className="bg-tunas-orange/10 p-8 rounded-[32px] border border-tunas-orange/20">
-                <h3 className="text-tunas-orange font-bold mb-4 flex items-center gap-2 text-sm">💡 Tips Poin</h3>
-                <ul className="text-[11px] text-tunas-dark space-y-4 font-medium leading-relaxed">
-                  <li>• Setor sampah rutin setiap minggu</li>
-                  <li>• Ikuti challenge mingguan</li>
-                  <li>• Ajak teman bergabung</li>
-                </ul>
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { val: referral?.invited ?? 0, label: 'Teman diajak' },
+                    { val: referral?.joined ?? 0, label: 'Sudah bergabung' },
+                    { val: referral?.totalBonusPoints ?? 0, label: 'Total bonus poin' },
+                  ].map((stat) => (
+                    <div
+                      key={stat.label}
+                      className="bg-[#E7F7EF] border border-[#CDE5D9] p-4 rounded-2xl text-center"
+                    >
+                      <p className="font-display text-2xl font-bold text-[#1A3022]">{stat.val}</p>
+                      <p className="font-sans text-[10px] font-bold uppercase text-[#2D6A4F] mt-1">{stat.label}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-
-              <div className="bg-[#E7F7EF] p-8 rounded-[32px] border border-green-100">
-                <h3 className="text-tunas-dark font-bold mb-2 text-sm">Poin = Uang Nyata</h3>
-                <p className="text-tunas-green font-bold text-xs mb-3">1 poin = Rp 10</p>
-                <p className="text-[10px] text-gray-400 leading-relaxed italic">Proses pencairan 1x24 jam ke e-wallet pilihanmu.</p>
-              </div>
-            </div>
+            )}
           </div>
-        </main>
+
+          <RewardSidebar />
+        </div>
       </div>
     </div>
   );

@@ -8,6 +8,14 @@ import climateImpactRoutes from "./routes/climate-impact.js";
 import challengeRoutes from "./routes/challenges.js";
 import leaderboardRoutes from "./routes/leaderboard.js";
 import badgesRoutes from "./routes/badges.js";
+import settingsRoutes from "./routes/settings.js";
+import helpRoutes from "./routes/help.js";
+import dropPointRoutes from "./routes/dropPoints.js";
+import depositRoutes from "./routes/deposits.js";
+import pickupRoutes from "./routes/pickups.js";
+import rewardRoutes from "./routes/rewards.js";
+import referralRoutes from "./routes/referral.js";
+import webhookRoutes from "./routes/webhooks.js";
 
 export function createApp() {
   const app = express();
@@ -23,24 +31,12 @@ export function createApp() {
       service: "Suarabumi API",
       framework: "Express.js",
       status: "running",
-      docs: "See README.md in the project root",
-      endpoints: {
-        health: "GET /health",
-        auth: {
-          register: "POST /api/auth/register",
-          login: "POST /api/auth/login",
-        },
-        profile: "GET|PATCH /api/profile (Bearer token)",
-        dashboard: "GET /api/dashboard (Bearer token)",
-        climateImpact: "GET /api/climate-impact (Bearer token)",
-        challenges: "GET /api/challenges/overview (Bearer token)",
-        leaderboard: "GET /api/leaderboard (Bearer token)",
-        badges: "GET /api/badges (Bearer token)",
-      },
+      docs: "See backend/API.md",
       demoLogin: {
         email: "putra.wijaya@email.com",
         password: "password123",
       },
+      operatorKey: "Header X-Operator-Key (dev: operator-dev-key)",
     });
   });
 
@@ -55,6 +51,14 @@ export function createApp() {
   app.use("/api/challenges", challengeRoutes);
   app.use("/api/leaderboard", leaderboardRoutes);
   app.use("/api/badges", badgesRoutes);
+  app.use("/api/settings", settingsRoutes);
+  app.use("/api/help", helpRoutes);
+  app.use("/api/drop-points", dropPointRoutes);
+  app.use("/api/deposits", depositRoutes);
+  app.use("/api/pickups", pickupRoutes);
+  app.use("/api/rewards", rewardRoutes);
+  app.use("/api/referral", referralRoutes);
+  app.use("/api/webhooks", webhookRoutes);
 
   app.use(
     (

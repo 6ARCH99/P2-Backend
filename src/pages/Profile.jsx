@@ -81,7 +81,7 @@ const Profile = ({ user, onUserUpdate }) => {
               {profile?.profilePhotoUrl ? (
                 <img src={profile.profilePhotoUrl} alt="" className="w-full h-full object-cover" />
               ) : (
-                <span className="text-white text-4xl font-bold font-serif">{userData.name.charAt(0)}</span>
+                <span className="text-white text-4xl font-bold font-heading">{userData.name.charAt(0)}</span>
               )}
             </div>
           </div>
@@ -89,7 +89,7 @@ const Profile = ({ user, onUserUpdate }) => {
           <div className="flex-1 z-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
               <div>
-                <h2 className="text-3xl font-bold text-[#1A3022] font-serif mb-2">{userData.name}</h2>
+                <h2 className="text-3xl font-bold text-[#1A3022] font-heading mb-2">{userData.name}</h2>
                 <div className="space-y-1">
                   <p className="flex items-center gap-2 text-gray-500 text-sm"><span className="opacity-60">📧</span> {userData.email}</p>
                   <p className="flex items-center gap-2 text-gray-500 text-sm"><span className="opacity-60">📞</span> {userData.phone}</p>
@@ -133,7 +133,7 @@ const Profile = ({ user, onUserUpdate }) => {
             <section className="bg-white rounded-[32px] p-8 border border-gray-100 shadow-sm">
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-10 h-10 bg-[#FEF6E0] rounded-xl flex items-center justify-center text-xl">🏆</div>
-                <h3 className="font-bold text-xl text-[#1A3022] font-serif">Pencapaian Terbaru</h3>
+                <h3 className="font-bold text-xl text-[#1A3022] font-heading">Pencapaian Terbaru</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {badges.map((b) => (
@@ -152,7 +152,7 @@ const Profile = ({ user, onUserUpdate }) => {
           <div className="space-y-6">
             <section className="bg-white rounded-[32px] p-6 border border-gray-100 shadow-sm">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="font-bold text-lg text-[#1A3022] font-serif">Aktivitas Terakhir</h3>
+                <h3 className="font-bold text-lg text-[#1A3022] font-heading">Aktivitas Terakhir</h3>
               </div>
               <div className="space-y-3">
                 {activities.map((act) => {
