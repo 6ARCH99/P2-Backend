@@ -40,7 +40,7 @@ Vite proxies `/api` → backend. Open the **frontend** URL in the browser, not p
 ## Structure
 
 ```
-backend/     Express.js + Prisma (SQLite)
+backend/     Express.js + Prisma (MySQL 8)
 src/         React (Vite) pages
 ```
 

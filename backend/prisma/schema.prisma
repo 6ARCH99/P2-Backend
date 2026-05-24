@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -13,7 +13,7 @@ model User {
   passwordHash    String?
   fullName        String
   phone           String
-  address         String
+  address         String   @db.Text
   profilePhotoUrl String?
   status          String   @default("active")
   rank            String   @default("Bronze")
@@ -134,7 +134,7 @@ model DropPoint {
   rating      Float    @default(4.5)
   reviewCount Int      @default(0)
   isOpen      Boolean  @default(true)
-  materials   String
+  materials   String   @db.Text
   createdAt   DateTime @default(now())
 
   depositTxns DepositTransaction[]
@@ -165,7 +165,7 @@ model DepositTransaction {
   totalWeightKg     Float     @default(0)
   co2SavedKg        Float     @default(0)
   pointsAwarded     Int       @default(0)
-  categoriesJson    String
+  categoriesJson    String    @db.Text
   verifiedAt        DateTime?
   verifiedBy        String?
   createdAt         DateTime  @default(now())
@@ -179,11 +179,11 @@ model DepositTransaction {
 model PickupSchedule {
   id              String    @id @default(cuid())
   userId          String
-  address         String
+  address         String    @db.Text
   scheduledAt     DateTime
   estimatedWeightKg Float
   status          String    @default("scheduled")
-  courierNote     String?
+  courierNote     String?   @db.Text
   actualWeightKg  Float?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -196,9 +196,9 @@ model Activity {
   userId      String
   type        String
   title       String
-  description String?
+  description String?  @db.Text
   pointsDelta Int      @default(0)
-  metadata    String?
+  metadata    String?  @db.Text
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -208,7 +208,7 @@ model Activity {
 model Challenge {
   id           String   @id @default(cuid())
   title        String
-  description  String
+  description  String   @db.Text
   targetValue  Float
   targetUnit   String   @default("kg")
   rewardPoints Int
@@ -238,7 +238,7 @@ model Badge {
   id          String   @id @default(cuid())
   code        String   @unique
   name        String
-  description String
+  description String   @db.Text
   icon        String
   createdAt   DateTime @default(now())
 
@@ -296,9 +296,9 @@ model ReferralEvent {
 
 model Faq {
   id       String @id @default(cuid())
-  question String
-  answer   String
-  keywords String
+  question String @db.Text
+  answer   String @db.Text
+  keywords String @db.Text
   category String @default("general")
 }
 
@@ -306,7 +306,7 @@ model SupportTicket {
   id        String   @id @default(cuid())
   userId    String
   subject   String
-  message   String
+  message   String   @db.Text
   status    String   @default("open")
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -317,7 +317,7 @@ model AuditLog {
   userId    String?
   action    String
   resource  String
-  metadata  String?
+  metadata  String?  @db.Text
   createdAt DateTime @default(now())
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
@@ -327,7 +327,7 @@ model NotificationQueue {
   userId    String
   channel   String
   event     String
-  payload   String
+  payload   String   @db.Text
   sent      Boolean  @default(false)
   createdAt DateTime @default(now())
 }

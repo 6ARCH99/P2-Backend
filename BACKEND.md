@@ -1,12 +1,24 @@
 # Suarabumi — Express.js Backend
 
-The team repo now includes an **Express.js** API in the `backend/` folder, wired to the React (Vite) frontend.
+Express API in `backend/` with **Prisma + MySQL 8**.
 
-## Run everything (recommended)
+## Quick start (Docker MySQL)
 
 ```powershell
-cd E:\Projects\Suarabumi-repo
+cd E:\Projects\Suarabumi\backend
 npm install
+npm run db:up          # starts MySQL on port 3306
+npm run db:wait        # wait until MySQL is ready
+npm run db:setup       # prisma db push + seed
+npm run dev
+```
+
+From repo root (frontend + API):
+
+```powershell
+cd E:\Projects\Suarabumi
+npm install
+cd backend; npm install; cd ..
 npm run setup:backend
 npm run dev:all
 ```
@@ -15,36 +27,48 @@ npm run dev:all
 |---------|-----|
 | Frontend (Vite) | http://localhost:5173 |
 | Express API | http://localhost:3001 |
+| MySQL | `127.0.0.1:3306` (database: `suarabumi`) |
 
-Vite proxies `/api`, `/uploads`, and `/health` to the backend automatically.
+## Environment
 
-## Run separately
+Copy `backend/.env.example` → `backend/.env`:
 
-**Terminal 1 — API:**
-```powershell
-cd E:\Projects\Suarabumi-repo\backend
-npm install
-npm run db:setup
-npm run dev
+```env
+DATABASE_URL="mysql://suarabumi:suarabumi_dev@127.0.0.1:3306/suarabumi"
 ```
 
-**Terminal 2 — Frontend:**
-```powershell
-cd E:\Projects\Suarabumi-repo
-npm install
-npm run dev
-```
+Docker credentials (default in `docker-compose.yml`):
+
+| Variable | Value |
+|----------|--------|
+| User | `suarabumi` |
+| Password | `suarabumi_dev` |
+| Database | `suarabumi` |
+| Root password | `root` |
 
 ## Demo login
 
 - Email: `putra.wijaya@email.com`
 - Password: `password123`
 
-## API modules (from sprint board)
+## Database commands
 
-- **Profil User** — `/api/profile`
-- **Dashboard / Home** — `/api/dashboard`
-- **Climate Impact** — `/api/climate-impact`
-- **Auth** — `/api/auth/login`, `/api/auth/register`
+| Command | Description |
+|---------|-------------|
+| `npm run db:up` | Start MySQL container |
+| `npm run db:down` | Stop MySQL container |
+| `npm run db:push` | Apply schema to MySQL |
+| `npm run db:seed` | Seed demo data |
+| `npm run db:migrate` | Create/apply Prisma migrations (optional) |
 
-Frontend pages connected: Login, Home, Profile, Impact.
+## External MySQL (production / team server)
+
+Set `DATABASE_URL` to your hosted MySQL connection string, then:
+
+```powershell
+npm run db:generate
+npx prisma db push
+npm run db:seed
+```
+
+See `backend/API.md` for full route list.
