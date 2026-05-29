@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import Reveal from '../components/motion/Reveal.jsx';
 
 const OTPPage = ({ onBack, onVerifySuccess, phoneNumber = "+62 812-3456-789" }) => {
   const [otp, setOtp] = useState(new Array(6).fill(""));
@@ -38,7 +39,7 @@ const OTPPage = ({ onBack, onVerifySuccess, phoneNumber = "+62 812-3456-789" }) 
   return (
     <div className="min-h-screen bg-[#F5F5F0] font-sans pb-20">
       {/* Navbar Minimalis */}
-      <nav className="flex justify-between items-center px-10 py-6">
+      <nav className="animate-nav flex justify-between items-center px-10 py-6">
         <div className="flex items-center gap-2 cursor-pointer" onClick={onBack}>
           <div className="w-8 h-8 bg-[#1A3022] rounded-full flex items-center justify-center text-white text-xs">🌱</div>
           <span className="text-xl font-bold text-[#1A3022]">Daurin.</span>
@@ -57,18 +58,17 @@ const OTPPage = ({ onBack, onVerifySuccess, phoneNumber = "+62 812-3456-789" }) 
       </nav>
 
       {/* Header Halaman */}
-      <div className="text-center mt-12 mb-10">
+      <Reveal className="text-center mt-12 mb-10">
         <span className="bg-[#D8E6DC] text-[#2D6A4F] text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest">
           Langkah 2 dari 2
         </span>
         <h1 className="text-5xl font-bold text-[#1A3022] mt-6 mb-4 font-heading leading-tight">Verifikasi OTP</h1>
         <p className="text-gray-500 text-sm">Kami telah mengirimkan kode 6 digit ke</p>
         <p className="font-bold text-[#1A3022] mt-1">{phoneNumber}</p>
-      </div>
+      </Reveal>
 
-      {/* Box Container */}
       <div className="max-w-2xl mx-auto px-6">
-        <div className="bg-white rounded-[40px] shadow-sm p-12 border border-gray-100 flex flex-col items-center">
+        <Reveal variant="scale" delay={80} className="bg-white rounded-[40px] shadow-sm p-12 border border-gray-100 flex flex-col items-center card-interactive">
           
           <form onSubmit={handleVerify} className="w-full space-y-10">
             {/* Input OTP Row */}
@@ -111,7 +111,7 @@ const OTPPage = ({ onBack, onVerifySuccess, phoneNumber = "+62 812-3456-789" }) 
               </button>
             </div>
           </form>
-        </div>
+        </Reveal>
       </div>
     </div>
   );

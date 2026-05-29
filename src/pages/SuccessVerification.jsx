@@ -34,7 +34,7 @@ const SuccessVerification = ({ onComplete }) => {
       {/* Content Berhasil */}
       <div className="flex-1 flex flex-col items-center justify-center text-center px-6">
         {/* Icon Checkmark */}
-        <div className="w-24 h-24 bg-[#D8E6DC] rounded-full flex items-center justify-center mb-10 animate-bounce">
+        <div className="w-24 h-24 bg-[#D8E6DC] rounded-full flex items-center justify-center mb-10" style={{ animation: 'scaleIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both' }}>
           <div className="w-12 h-12 border-b-4 border-r-4 border-[#1A3022] rotate-45 mb-2 ml-1"></div>
         </div>
 

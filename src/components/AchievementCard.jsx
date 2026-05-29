@@ -1,5 +1,5 @@
 const AchievementCard = ({ title, desc, date, icon }) => (
-  <div className="bg-white p-5 rounded-2xl border border-gray-50 flex items-center gap-4 hover:shadow-md transition-shadow">
+  <div className="bg-white p-5 rounded-2xl border border-gray-50 flex items-center gap-4 card-interactive">
     <div className="w-12 h-12 bg-tunas-bg rounded-full flex items-center justify-center text-xl">
       {icon}
     </div>

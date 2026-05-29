@@ -3,10 +3,10 @@ const RewardCard = ({ amount, points, isLocked, onRedeem, loading }) => (
     type="button"
     disabled={isLocked || loading}
     onClick={onRedeem}
-    className={`w-full text-left p-6 rounded-2xl border transition-all ${
+    className={`w-full text-left p-6 rounded-2xl border btn-motion ${
       isLocked
         ? 'bg-gray-50/80 border-gray-100 cursor-not-allowed'
-        : 'bg-white border-gray-100 shadow-sm hover:shadow-md cursor-pointer hover:border-[#1A3022]/30'
+        : 'bg-white border-gray-100 shadow-sm card-interactive cursor-pointer hover:border-[#1A3022]/30'
     }`}
   >
     <div className="flex justify-between items-start mb-2">

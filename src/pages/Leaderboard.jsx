@@ -2,11 +2,27 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '../services/api.js';
 import ApiStatusBanner from '../components/ApiStatusBanner.jsx';
 
+const WILAYAH_OPTIONS = [
+  { value: 'rt', label: 'RT', icon: '🏘️' },
+  { value: 'kota', label: 'Kota', icon: '🏙️' },
+  { value: 'provinsi', label: 'Provinsi', icon: '🗺️' },
+  { value: 'negara', label: 'Negara', icon: '🌍' },
+];
+
+const PERIODE_OPTIONS = [
+  { value: 'hari', label: 'Hari', icon: '📅' },
+  { value: 'minggu', label: 'Minggu', icon: '📆' },
+  { value: 'bulan', label: 'Bulan', icon: '🗓️' },
+  { value: 'tahun', label: 'Tahun', icon: '📊' },
+];
+
 const Leaderboard = () => {
   const [list, setList] = useState([]);
   const [badgeProgress, setBadgeProgress] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [wilayah, setWilayah] = useState('kota');
+  const [periode, setPeriode] = useState('minggu');
 
   const load = useCallback(() => {
     if (!localStorage.getItem('suarabumi_token')) {
@@ -47,6 +63,9 @@ const Leaderboard = () => {
 
   const formatPoints = (n) => (n != null ? Number(n).toLocaleString('id-ID') : '—');
 
+  const activeWilayah = WILAYAH_OPTIONS.find((o) => o.value === wilayah);
+  const activePeriode = PERIODE_OPTIONS.find((o) => o.value === periode);
+
   return (
     <div className="min-h-screen bg-[#F9F7F2] px-6 md:px-20 py-10 font-sans text-[#1A2E35]">
       {/* Header Halaman */}
@@ -67,19 +86,65 @@ const Leaderboard = () => {
         )}
       </div>
 
-      {/* Filter Section */}
-      <div className="flex gap-4 mb-8">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-gray-400 uppercase">Wilayah:</span>
-          <select className="bg-[#1A3022] text-white text-xs font-bold py-2 px-4 rounded-full appearance-none cursor-pointer">
-            <option>PROVINSI</option>
-          </select>
+      {/* Filter Section — Pill Toggle Style */}
+      <div className="bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 mb-8">
+        <div className="flex flex-col sm:flex-row gap-6">
+          {/* Wilayah Filter */}
+          <div className="flex-1">
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3 block">🗺️ Wilayah</span>
+            <div className="flex flex-wrap gap-2">
+              {WILAYAH_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setWilayah(opt.value)}
+                  className={`text-xs font-bold py-2 px-4 rounded-full transition-all duration-200 ${
+                    wilayah === opt.value
+                      ? 'bg-[#1A3022] text-white shadow-md scale-105'
+                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
+                  }`}
+                >
+                  {opt.icon} {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="hidden sm:block w-px bg-gray-100" />
+
+          {/* Periode Filter */}
+          <div className="flex-1">
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3 block">📅 Periode</span>
+            <div className="flex flex-wrap gap-2">
+              {PERIODE_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setPeriode(opt.value)}
+                  className={`text-xs font-bold py-2 px-4 rounded-full transition-all duration-200 ${
+                    periode === opt.value
+                      ? 'bg-[#1A3022] text-white shadow-md scale-105'
+                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
+                  }`}
+                >
+                  {opt.icon} {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-gray-400 uppercase">Periode:</span>
-          <select className="bg-[#1A3022] text-white text-xs font-bold py-2 px-4 rounded-full appearance-none cursor-pointer">
-            <option>MINGGU INI</option>
-          </select>
+
+        {/* Active Filters Summary */}
+        <div className="mt-4 pt-4 border-t border-gray-50 flex items-center gap-2 text-[10px] text-gray-400">
+          <span className="font-bold uppercase tracking-wider">Filter aktif:</span>
+          <span className="bg-[#E9F5EF] text-[#2D6A4F] font-bold px-3 py-1 rounded-full">
+            {activeWilayah?.icon} {activeWilayah?.label}
+          </span>
+          <span className="text-gray-300">•</span>
+          <span className="bg-[#FFF9E7] text-[#D99A29] font-bold px-3 py-1 rounded-full">
+            {activePeriode?.icon} {activePeriode?.label}
+          </span>
         </div>
       </div>
 

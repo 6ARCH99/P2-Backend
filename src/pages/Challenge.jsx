@@ -6,6 +6,8 @@ const Challenge = () => {
   const [overview, setOverview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedChallenge, setSelectedChallenge] = useState(null);
+  const [confirmingCancel, setConfirmingCancel] = useState(null);
 
   const load = useCallback(() => {
     if (!localStorage.getItem('suarabumi_token')) {
@@ -52,9 +54,24 @@ const Challenge = () => {
       if (!challengeId) return;
       try {
         await api.joinChallenge(challengeId);
+        setSelectedChallenge(null);
         load();
       } catch (err) {
         setError(err?.message ?? 'Gagal ikut challenge.');
+      }
+    },
+    [load]
+  );
+
+  const cancel = useCallback(
+    async (challengeId) => {
+      if (!challengeId) return;
+      try {
+        await api.cancelChallenge(challengeId);
+        setSelectedChallenge(null);
+        load();
+      } catch (err) {
+        setError(err?.message ?? 'Gagal membatalkan challenge.');
       }
     },
     [load]
@@ -151,7 +168,9 @@ const Challenge = () => {
                 <span className="text-gray-400 flex items-center gap-1">🕒 {item.durationDays} hari</span>
                 <span className="text-green-600">+{item.rewardPoints} pts</span>
               </div>
-              <button className="w-full mt-4 py-2 bg-gray-50 text-gray-600 rounded-xl text-xs font-bold group-hover:bg-[#E9F5EF] group-hover:text-[#2D4A37] transition-all">
+              <button 
+                onClick={() => setSelectedChallenge({ ...item, isActive: true })}
+                className="w-full mt-4 py-2 bg-gray-50 text-gray-600 rounded-xl text-xs font-bold group-hover:bg-[#E9F5EF] group-hover:text-[#2D4A37] transition-all">
                 Lihat Detail
               </button>
             </div>
@@ -188,13 +207,22 @@ const Challenge = () => {
               </div>
               <div className="flex items-center justify-between border-t border-gray-50 pt-4">
                 <span className="font-bold text-green-600 text-xs">+{item.rewardPoints} pts</span>
-                <button
-                  type="button"
-                  onClick={() => join(item.id)}
-                  className="bg-[#1A2E35] text-white px-4 py-2 rounded-lg text-[10px] font-bold hover:opacity-90"
-                >
-                  Ikut Challenge
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedChallenge({ ...item, isAvailable: true })}
+                    className="bg-gray-100 text-[#1A2E35] px-4 py-2 rounded-lg text-[10px] font-bold hover:bg-gray-200 transition-colors"
+                  >
+                    Detail
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => join(item.id)}
+                    className="bg-[#1A2E35] text-white px-4 py-2 rounded-lg text-[10px] font-bold hover:opacity-90 transition-opacity"
+                  >
+                    Ikut
+                  </button>
+                </div>
               </div>
             </div>
           );
@@ -254,6 +282,136 @@ const Challenge = () => {
           </div>
         </section>
       </div>
+
+      {/* Detail Modal */}
+      {selectedChallenge && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 modal-backdrop" onClick={() => setSelectedChallenge(null)}>
+          <div className="bg-white rounded-3xl p-8 max-w-md w-full relative shadow-xl modal-panel" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setSelectedChallenge(null)}
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 font-bold transition-colors"
+            >
+              ✕
+            </button>
+
+            {/* Status Badge */}
+            <div className="mb-4">
+              {selectedChallenge.isActive ? (
+                <span className="text-[10px] font-bold text-green-600 bg-green-50 px-3 py-1 rounded-full">
+                  ✅ Sedang Diikuti
+                </span>
+              ) : (
+                <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                  📋 Tersedia
+                </span>
+              )}
+            </div>
+
+            <h3 className="text-2xl font-bold mb-2">{selectedChallenge.title}</h3>
+            
+            {/* Meta info */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              <span className="text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded-lg flex items-center gap-1">
+                🎁 +{selectedChallenge.rewardPoints} pts
+              </span>
+              <span className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg flex items-center gap-1">
+                🕒 {selectedChallenge.durationDays} hari
+              </span>
+              {selectedChallenge.joinedCount != null && (
+                <span className="text-xs font-bold text-purple-500 bg-purple-50 px-3 py-1.5 rounded-lg flex items-center gap-1">
+                  👥 {selectedChallenge.joinedCount} peserta
+                </span>
+              )}
+              {selectedChallenge.difficulty && (
+                <span className={`text-xs font-bold px-3 py-1.5 rounded-lg ${
+                  selectedChallenge.difficulty === 'easy' ? 'text-blue-400 bg-blue-50' :
+                  selectedChallenge.difficulty === 'hard' ? 'text-red-400 bg-red-50' :
+                  'text-orange-400 bg-orange-50'
+                }`}>
+                  {selectedChallenge.difficulty === 'easy' ? '🟢' : selectedChallenge.difficulty === 'hard' ? '🔴' : '🟡'} {selectedChallenge.difficulty}
+                </span>
+              )}
+            </div>
+
+            <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+              {selectedChallenge.description}
+            </p>
+
+            {/* Progress bar for active challenges */}
+            {selectedChallenge.isActive && (
+              <div className="bg-gray-50 rounded-2xl p-4 mb-6">
+                <div className="flex justify-between text-xs font-bold mb-2">
+                  <span className="text-gray-500">Progress</span>
+                  <span className="text-green-600">{selectedChallenge.progressPercent ?? 0}%</span>
+                </div>
+                <div className="w-full bg-gray-200 h-2.5 rounded-full overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-[#2D6A4F] to-[#86BC8A] h-full rounded-full transition-all duration-700"
+                    style={{ width: `${selectedChallenge.progressPercent ?? 0}%` }}
+                  />
+                </div>
+                <p className="text-[10px] text-gray-400 mt-2">
+                  {selectedChallenge.progress ?? 0} / {selectedChallenge.target ?? '—'} {selectedChallenge.unit ?? ''}
+                </p>
+              </div>
+            )}
+
+            {/* Rules / Tips */}
+            <div className="bg-[#F9F7F2] rounded-2xl p-4 mb-6">
+              <h4 className="text-xs font-bold text-[#1A3022] mb-2 flex items-center gap-1">💡 Cara Menyelesaikan</h4>
+              <ul className="space-y-1.5">
+                <li className="text-[11px] text-gray-500 flex items-start gap-2">
+                  <span className="text-green-500 mt-0.5">•</span> Setor sampah sesuai target yang ditentukan
+                </li>
+                <li className="text-[11px] text-gray-500 flex items-start gap-2">
+                  <span className="text-green-500 mt-0.5">•</span> Pastikan sampah dipilah dengan benar
+                </li>
+                <li className="text-[11px] text-gray-500 flex items-start gap-2">
+                  <span className="text-green-500 mt-0.5">•</span> Selesaikan sebelum batas waktu berakhir
+                </li>
+              </ul>
+            </div>
+            
+            {/* Action buttons */}
+            <div className="flex gap-3">
+              {selectedChallenge.isActive ? (
+                <>
+                  {confirmingCancel === selectedChallenge.id ? (
+                    <>
+                      <button
+                        onClick={() => { cancel(selectedChallenge.id); setConfirmingCancel(null); }}
+                        className="flex-1 bg-red-500 text-white font-bold py-3 rounded-xl hover:bg-red-600 transition-colors text-sm"
+                      >
+                        ⚠️ Ya, Batalkan
+                      </button>
+                      <button
+                        onClick={() => setConfirmingCancel(null)}
+                        className="flex-1 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-200 transition-colors text-sm"
+                      >
+                        Kembali
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => setConfirmingCancel(selectedChallenge.id)}
+                      className="flex-1 bg-red-50 text-red-600 font-bold py-3 rounded-xl hover:bg-red-100 transition-colors text-sm border border-red-100"
+                    >
+                      🚫 Batalkan Challenge
+                    </button>
+                  )}
+                </>
+              ) : selectedChallenge.isAvailable ? (
+                <button
+                  onClick={() => join(selectedChallenge.id)}
+                  className="flex-1 bg-[#1A2E35] text-white font-bold py-3 rounded-xl hover:opacity-90 transition-opacity text-sm flex items-center justify-center gap-2"
+                >
+                  🚀 Ikut Challenge <span className="text-green-400">+{selectedChallenge.rewardPoints} pts</span>
+                </button>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

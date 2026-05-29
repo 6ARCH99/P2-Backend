@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { clearAuth, getStoredUser } from './services/api.js';
+import AnimatedPage from './components/motion/AnimatedPage.jsx';
+import AnimatedRoute from './components/motion/AnimatedRoute.jsx';
 
 // Import Komponen & Pages
 import Navbar from './components/Navbar'; 
@@ -97,7 +99,7 @@ function App() {
               path="/" 
               element={
                 !isLoggedIn ? (
-                  <>
+                  <AnimatedPage key={authView}>
                     {authView === 'landing' && (
                       <LandingPage 
                         onLogin={() => setAuthView('login')} 
@@ -140,7 +142,7 @@ function App() {
                     {authView === 'forgot-password' && (
                       <ForgotPassword onBack={() => setAuthView('login')} />
                     )}
-                  </>
+                  </AnimatedPage>
                 ) : (
                   <Navigate to="/home" replace />
                 )
@@ -150,27 +152,37 @@ function App() {
             {/* 2. ROUTE UTAMA (PROTECTED) */}
             <Route
               path="/home"
-              element={requireApiSession ? <Home user={user} key={user?.id || 'home'} /> : <Navigate to="/" />}
+              element={
+                requireApiSession ? (
+                  <AnimatedRoute>
+                    <Home user={user} key={user?.id || 'home'} />
+                  </AnimatedRoute>
+                ) : (
+                  <Navigate to="/" />
+                )
+              }
             />
-            <Route path="/reward" element={isLoggedIn ? <Reward /> : <Navigate to="/" />} />
-            <Route path="/challenge" element={isLoggedIn ? <Challenge /> : <Navigate to="/" />} />
-            <Route path="/impact" element={requireApiSession ? <ImpactPage /> : <Navigate to="/" />} />
-            <Route path="/drop-point" element={isLoggedIn ? <DropPointPage /> : <Navigate to="/" />} />
-            <Route path="/penjemputan" element={isLoggedIn ? <PenjemputanPage /> : <Navigate to="/" />} />
+            <Route path="/reward" element={isLoggedIn ? <AnimatedRoute><Reward /></AnimatedRoute> : <Navigate to="/" />} />
+            <Route path="/challenge" element={isLoggedIn ? <AnimatedRoute><Challenge /></AnimatedRoute> : <Navigate to="/" />} />
+            <Route path="/impact" element={requireApiSession ? <AnimatedRoute><ImpactPage /></AnimatedRoute> : <Navigate to="/" />} />
+            <Route path="/drop-point" element={isLoggedIn ? <AnimatedRoute><DropPointPage /></AnimatedRoute> : <Navigate to="/" />} />
+            <Route path="/penjemputan" element={isLoggedIn ? <AnimatedRoute><PenjemputanPage /></AnimatedRoute> : <Navigate to="/" />} />
             
             {/* --- ROUTE LEADERBOARD & BADGES --- */}
-            <Route path="/leaderboard" element={isLoggedIn ? <Leaderboard /> : <Navigate to="/" />} />
-            <Route path="/badges" element={isLoggedIn ? <Badges /> : <Navigate to="/" />} />
+            <Route path="/leaderboard" element={isLoggedIn ? <AnimatedRoute><Leaderboard /></AnimatedRoute> : <Navigate to="/" />} />
+            <Route path="/badges" element={isLoggedIn ? <AnimatedRoute><Badges /></AnimatedRoute> : <Navigate to="/" />} />
 
             <Route
               path="/profile"
               element={
                 requireApiSession ? (
-                  <Profile
-                    user={user}
-                    onLogout={handleLogout}
-                    onUserUpdate={(u) => setUser(u)}
-                  />
+                  <AnimatedRoute>
+                    <Profile
+                      user={user}
+                      onLogout={handleLogout}
+                      onUserUpdate={(u) => setUser(u)}
+                    />
+                  </AnimatedRoute>
                 ) : (
                   <Navigate to="/" />
                 )
@@ -180,23 +192,23 @@ function App() {
             {/* 3. ROUTE PENGATURAN & SUB-SETTINGS */}
             <Route 
               path="/settings" 
-              element={isLoggedIn ? <SettingsWithNavigation handleLogout={handleLogout} /> : <Navigate to="/" />} 
+              element={isLoggedIn ? <AnimatedRoute><SettingsWithNavigation handleLogout={handleLogout} /></AnimatedRoute> : <Navigate to="/" />} 
             />
             <Route 
               path="/settings/notifications" 
-              element={isLoggedIn ? <NotificationWithNavigation /> : <Navigate to="/" />} 
+              element={isLoggedIn ? <AnimatedRoute><NotificationWithNavigation /></AnimatedRoute> : <Navigate to="/" />} 
             />
             <Route 
               path="/settings/preferences" 
-              element={isLoggedIn ? <PreferenceWithNavigation /> : <Navigate to="/" />} 
+              element={isLoggedIn ? <AnimatedRoute><PreferenceWithNavigation /></AnimatedRoute> : <Navigate to="/" />} 
             />
             <Route 
               path="/settings/help" 
-              element={isLoggedIn ? <HelpWithNavigation /> : <Navigate to="/" />} 
+              element={isLoggedIn ? <AnimatedRoute><HelpWithNavigation /></AnimatedRoute> : <Navigate to="/" />} 
             />
             <Route 
               path="/settings/password" 
-              element={isLoggedIn ? <ForgotPassword onBack={() => window.history.back()} /> : <Navigate to="/" />} 
+              element={isLoggedIn ? <AnimatedRoute><ForgotPassword onBack={() => window.history.back()} /></AnimatedRoute> : <Navigate to="/" />} 
             />
             
             <Route path="*" element={<Navigate to="/" />} />

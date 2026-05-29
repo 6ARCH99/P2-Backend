@@ -1,5 +1,10 @@
-/** In dev, use Vite proxy (empty base). Set VITE_API_URL=http://127.0.0.1:3001 to bypass proxy if needed. */
 const API_BASE = import.meta.env.VITE_API_URL || "";
+
+export function getImageUrl(path) {
+  if (!path) return "";
+  if (path.startsWith("http") || path.startsWith("data:") || path.startsWith("blob:")) return path;
+  return `${API_BASE}${path}`;
+}
 
 function getToken() {
   return localStorage.getItem("suarabumi_token");
@@ -100,11 +105,18 @@ export const api = {
   getChallengeOverview: () => request("/api/challenges/overview"),
   joinChallenge: (challengeId) =>
     request(`/api/challenges/${challengeId}/join`, { method: "POST" }),
+  cancelChallenge: (challengeId) =>
+    request(`/api/challenges/${challengeId}/cancel`, { method: "POST" }),
   getLeaderboard: (limit = 10) => request(`/api/leaderboard?limit=${limit}`),
   getBadges: () => request("/api/badges"),
   getProfile: () => request("/api/profile"),
   updateProfile: (body) =>
     request("/api/profile", { method: "PATCH", body: JSON.stringify(body) }),
+  uploadProfilePhoto: (file) => {
+    const formData = new FormData();
+    formData.append("photo", file);
+    return request("/api/profile/photo", { method: "POST", body: formData });
+  },
   getProfileStats: () => request("/api/profile/stats"),
   getProfileBadges: () => request("/api/profile/badges"),
   getProfileActivities: () => request("/api/profile/activities"),

@@ -2,6 +2,17 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '../services/api.js';
 import ApiStatusBanner from '../components/ApiStatusBanner.jsx';
 
+const DUMMY_LOCKED_BADGES = [
+  { id: 'l1', icon: '🌍', name: 'Earth Savior', description: 'Kumpulkan 1000 poin', progressHint: '420/1000 poin' },
+  { id: 'l2', icon: '♻️', name: 'Recycle Master', description: 'Daur ulang 50kg sampah', progressHint: '18/50 kg' },
+  { id: 'l3', icon: '🌱', name: 'Green Influencer', description: 'Ajak 5 teman bergabung', progressHint: '2/5 teman' },
+  { id: 'l4', icon: '🔥', name: 'Streak 30 Hari', description: 'Aktif 30 hari berturut-turut', progressHint: '12/30 hari' },
+  { id: 'l5', icon: '🏅', name: 'Top 10 Weekly', description: 'Masuk peringkat 10 besar mingguan', progressHint: 'Peringkat saat ini: #24' },
+  { id: 'l6', icon: '💎', name: 'Diamond Collector', description: 'Kumpulkan 5000 poin total', progressHint: '1200/5000 poin' },
+  { id: 'l7', icon: '🌳', name: 'Tree Planter', description: 'Selamatkan 100kg CO₂', progressHint: '34/100 kg CO₂' },
+  { id: 'l8', icon: '⭐', name: 'Super Star', description: 'Selesaikan 10 challenge', progressHint: '3/10 challenge' },
+];
+
 const Badges = () => {
   const [earned, setEarned] = useState([]);
   const [locked, setLocked] = useState([]);
@@ -142,19 +153,31 @@ const Badges = () => {
               ))}
             </>
           )}
-          {!loading && locked.length === 0 && (
-            <div className="bg-white rounded-[20px] p-5 border border-gray-100 col-span-2 md:col-span-4">
-              <p className="text-xs text-gray-500 font-bold">Semua badge sudah terkumpul.</p>
-            </div>
-          )}
-          {locked.map((badge) => (
-            <div key={badge.id} className="bg-white/50 rounded-[20px] p-5 border border-dashed border-gray-200 text-center grayscale opacity-70">
-              <div className="text-4xl mb-3 mt-2">{badge.icon}</div>
-              <h4 className="font-bold text-xs text-gray-500 mb-1">{badge.name}</h4>
+          {!loading && (locked.length > 0 ? locked : DUMMY_LOCKED_BADGES).map((badge) => (
+            <div key={badge.id} className="bg-white/60 rounded-[20px] p-5 border border-dashed border-gray-200 text-center relative group hover:border-gray-300 hover:bg-white/80 transition-all duration-300">
+              {/* Lock overlay icon */}
+              <div className="absolute top-3 right-3 w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-[10px] group-hover:bg-orange-100 group-hover:text-orange-500 transition-colors">
+                🔒
+              </div>
+              <div className="text-4xl mb-3 mt-2 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-70 transition-all duration-300">
+                {badge.icon}
+              </div>
+              <h4 className="font-bold text-xs text-gray-400 mb-1 group-hover:text-gray-600 transition-colors">{badge.name}</h4>
               <p className="text-[9px] text-gray-400 font-bold leading-relaxed min-h-8">
                 {badge.description}
               </p>
-              <p className="text-[8px] text-gray-400 pt-2 border-t border-gray-100">Terkunci</p>
+              {/* Progress hint */}
+              {badge.progressHint && (
+                <div className="mt-2 pt-2 border-t border-gray-100">
+                  <p className="text-[8px] text-orange-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    📊 {badge.progressHint}
+                  </p>
+                  <p className="text-[8px] text-gray-400 group-hover:hidden">Terkunci</p>
+                </div>
+              )}
+              {!badge.progressHint && (
+                <p className="text-[8px] text-gray-400 pt-2 border-t border-gray-100">Terkunci</p>
+              )}
             </div>
           ))}
         </div>

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import Reveal from '../components/motion/Reveal.jsx';
 import { Gift, LineChart, Users, Lightbulb } from 'lucide-react';
 import RewardCard from '../components/RewardCard';
 import RewardPlatformPicker from '../components/reward/RewardPlatformPicker';
@@ -148,13 +149,13 @@ const Reward = () => {
         )}
 
         {/* Hero */}
-        <div className="bg-[#1A3022] rounded-[24px] p-8 md:p-10 text-white mb-8">
+        <Reveal variant="scale" className="bg-[#1A3022] rounded-[24px] p-8 md:p-10 text-white mb-8">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
             <div>
               <p className="font-sans text-[10px] font-bold uppercase tracking-[0.12em] text-white/60 mb-3">
                 REWARD CENTRE
               </p>
-              <p className="font-display text-[3.5rem] md:text-[3.75rem] font-bold leading-none tracking-tight text-white">
+              <p className="font-display text-[3.5rem] md:text-[3.75rem] font-bold leading-none tracking-tight text-white animate-stat">
                 {loading ? '…' : available.toLocaleString('id-ID')}
               </p>
               <p className="font-sans text-sm font-normal text-white/75 mt-2">Poin tersedia</p>
@@ -192,16 +193,15 @@ const Reward = () => {
               </div>
             </div>
           )}
-        </div>
+        </Reveal>
 
-        {/* Tabs */}
         <div className="flex flex-wrap gap-3 mb-8">
           {TABS.map(({ id, label, Icon }) => (
             <button
               key={id}
               type="button"
               onClick={() => setActiveTab(id)}
-              className={`px-6 py-3 rounded-2xl font-sans text-xs font-bold uppercase tracking-wide flex items-center gap-2 border transition-all ${
+              className={`px-6 py-3 rounded-2xl font-sans text-xs font-bold uppercase tracking-wide flex items-center gap-2 border btn-motion ${
                 activeTab === id
                   ? 'bg-[#1A3022] text-white border-[#1A3022] shadow-sm'
                   : 'bg-white text-[#1A3022] border-gray-100 hover:bg-gray-50'
@@ -213,7 +213,7 @@ const Reward = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
+        <div key={activeTab} className="animate-page grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
           <div className="lg:col-span-2 space-y-8">
             {activeTab === 'tukar' && (
               <>

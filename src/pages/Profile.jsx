@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import StatsCard from '../components/StatsCard';
 import AchievementCard from '../components/AchievementCard';
 import EditProfileModal from '../components/EditProfileModal.jsx';
-import { api } from '../services/api.js';
+import { api, getImageUrl } from '../services/api.js';
 
 const Profile = ({ user, onUserUpdate }) => {
   const [profile, setProfile] = useState(null);
@@ -79,7 +79,7 @@ const Profile = ({ user, onUserUpdate }) => {
           <div className="relative z-10">
             <div className="w-28 h-28 bg-[#2D4A37] rounded-3xl flex items-center justify-center overflow-hidden shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300">
               {profile?.profilePhotoUrl ? (
-                <img src={profile.profilePhotoUrl} alt="" className="w-full h-full object-cover" />
+                <img src={getImageUrl(profile.profilePhotoUrl)} alt="" className="w-full h-full object-cover" />
               ) : (
                 <span className="text-white text-4xl font-bold font-heading">{userData.name.charAt(0)}</span>
               )}

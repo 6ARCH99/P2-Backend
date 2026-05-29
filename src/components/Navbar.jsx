@@ -16,7 +16,7 @@ const Navbar = () => {
   const isPathActive = (path) => location.pathname === path;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 h-20 flex items-center justify-between px-8 lg:px-10 border-b border-gray-200/50 bg-[#F5F5F0]/95 backdrop-blur-md z-[100]">
+    <nav className="animate-nav fixed top-0 left-0 right-0 h-20 flex items-center justify-between px-8 lg:px-10 border-b border-gray-200/50 bg-[#F5F5F0]/95 backdrop-blur-md z-[100]">
       <Link to="/home" className="flex items-center gap-3 group shrink-0">
         <div className="h-10 w-10 rounded-full bg-[#1A3022] flex items-center justify-center overflow-hidden border-2 border-[#1A3022] group-hover:scale-105 transition-transform shadow-sm">
           <img src={LogoDaurin} alt="Daurin" className="h-full w-full object-cover" />
@@ -63,7 +63,7 @@ const Navbar = () => {
             <Link
               key={to}
               to={to}
-              className={`w-10 h-10 rounded-full flex items-center justify-center text-white transition-all shadow-sm active:scale-90 ${
+              className={`w-10 h-10 rounded-full flex items-center justify-center text-white btn-motion shadow-sm ${
                 active ? 'bg-[#2D6A4F]' : 'bg-[#1A3022] hover:bg-[#2D4A37]'
               } ${to === '/profile' && active ? 'ring-2 ring-offset-2 ring-[#2D6A4F]' : ''}`}
             >

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import LogoDaurin from '../assets/Logo Daurin.jpeg';
 import { api, setAuth } from '../services/api.js';
+import Reveal from '../components/motion/Reveal.jsx';
 
 const RegisterPage = ({ onBack, onGoToLogin, onContinue, onRegisterSuccess }) => {
   const [formData, setFormData] = useState({
@@ -81,7 +82,7 @@ const RegisterPage = ({ onBack, onGoToLogin, onContinue, onRegisterSuccess }) =>
   return (
     <div className="min-h-screen bg-[#F5F5F0] font-sans pb-20">
       {/* Navbar Minimalis - Tetap sesuai codingan awal */}
-      <nav className="flex justify-between items-center px-10 py-6">
+      <nav className="animate-nav flex justify-between items-center px-10 py-6">
         <div className="flex items-center gap-2 cursor-pointer" onClick={onBack}>
           <img 
             src={LogoDaurin} 
@@ -106,17 +107,16 @@ const RegisterPage = ({ onBack, onGoToLogin, onContinue, onRegisterSuccess }) =>
       </nav>
 
       {/* Header Halaman */}
-      <div className="text-center mt-10 mb-8 px-6">
+      <Reveal className="text-center mt-10 mb-8 px-6">
         <span className="bg-[#D8E6DC] text-[#2D6A4F] text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest">
           Langkah 1 dari 2
         </span>
         <h1 className="text-5xl font-bold text-[#1A3022] mt-6 mb-4 font-heading leading-tight">Buat Akun Tunas</h1>
         <p className="text-gray-500 text-sm">Bergabunglah dengan ribuan pengguna yang sudah bergerak untuk lingkungan</p>
-      </div>
+      </Reveal>
 
-      {/* Form Container */}
       <div className="max-w-3xl mx-auto px-6">
-        <div className="bg-white rounded-[40px] shadow-sm p-8 md:p-12 border border-gray-100">
+        <Reveal variant="scale" delay={80} className="bg-white rounded-[40px] shadow-sm p-8 md:p-12 border border-gray-100 card-interactive">
           <form onSubmit={handleSubmit} className="space-y-6">
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -237,7 +237,7 @@ const RegisterPage = ({ onBack, onGoToLogin, onContinue, onRegisterSuccess }) =>
               Sudah punya akun? <span onClick={onGoToLogin} className="text-[#1A3022] font-bold cursor-pointer hover:underline">Masuk di sini</span>
             </p>
           </div>
-        </div>
+        </Reveal>
       </div>
     </div>
   );

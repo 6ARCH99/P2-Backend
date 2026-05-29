@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import LogoDaurin from '../assets/Logo Daurin.jpeg';
 import { api, setAuth } from '../services/api.js';
+import Reveal from '../components/motion/Reveal.jsx';
 
 const LoginPage = ({ onBack, onLoginSuccess, onGoToRegister }) => {
   const [email, setEmail] = useState('');
@@ -62,7 +63,7 @@ const LoginPage = ({ onBack, onLoginSuccess, onGoToRegister }) => {
 
   return (
     <div className="min-h-screen bg-[#F5F5F0] font-sans text-left">
-      <nav className="flex justify-between items-center px-10 py-6 bg-white/50 backdrop-blur-sm">
+      <nav className="animate-nav flex justify-between items-center px-10 py-6 bg-white/50 backdrop-blur-sm">
         <div className="flex items-center gap-2 cursor-pointer" onClick={onBack}>
           <img
             src={LogoDaurin}
@@ -97,11 +98,11 @@ const LoginPage = ({ onBack, onLoginSuccess, onGoToRegister }) => {
           ← Kembali ke Beranda
         </button>
 
-        <div className="flex flex-col items-center">
+        <Reveal variant="scale" className="flex flex-col items-center w-full">
           <h2 className="text-4xl font-bold text-[#1A3022] mb-2 font-heading">Selamat Datang Kembali!</h2>
           <p className="text-gray-500 text-sm mb-10">Lanjutkan perjalanan aksi iklimmu bersama Daurin</p>
 
-          <div className="w-full max-w-md bg-white p-10 rounded-[40px] shadow-xl">
+          <div className="w-full max-w-md bg-white p-10 rounded-[40px] shadow-xl card-interactive">
             <form onSubmit={handleSubmit} className="space-y-5">
               {submitError && (
                 <p className="text-red-500 text-xs font-bold bg-red-50 p-3 rounded-xl">{submitError}</p>
@@ -174,7 +175,7 @@ const LoginPage = ({ onBack, onLoginSuccess, onGoToRegister }) => {
               </p>
             </div>
           </div>
-        </div>
+        </Reveal>
       </div>
     </div>
   );

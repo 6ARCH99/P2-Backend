@@ -1,5 +1,5 @@
 const ProfileCard = () => (
-  <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm mb-8">
+  <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm mb-8 card-interactive">
     <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
       {/* Avatar */}
       <div className="relative">

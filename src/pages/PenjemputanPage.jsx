@@ -179,13 +179,13 @@ const PenjemputanPage = () => {
 
       {isModalOpen && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm modal-backdrop"
           onClick={() => setIsModalOpen(false)}
           role="dialog"
           aria-modal="true"
         >
           <form
-            className="bg-white w-full max-w-lg rounded-[32px] shadow-2xl border p-8"
+            className="bg-white w-full max-w-lg rounded-[32px] shadow-2xl border p-8 modal-panel"
             onClick={(e) => e.stopPropagation()}
             onSubmit={handleCreate}
           >

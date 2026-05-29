@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import StatsCard from '../components/StatsCard';
 import { api } from '../services/api.js';
 import ApiStatusBanner from '../components/ApiStatusBanner.jsx';
+import Reveal from '../components/motion/Reveal.jsx';
+import RevealGrid from '../components/motion/RevealGrid.jsx';
 
 const formatNumber = (n) => (n != null ? Number(n).toLocaleString('id-ID') : '—');
 
@@ -60,7 +62,7 @@ const Home = ({ user }) => {
     <div className="app-page">
       <div className="app-page-inner max-w-6xl">
         <main>
-          <div className="app-page-header">
+          <Reveal className="app-page-header">
             <h1 className="type-page-title mb-2">
               Selamat Datang, {userName}! 👋
             </h1>
@@ -72,14 +74,14 @@ const Home = ({ user }) => {
               <button
                 type="button"
                 onClick={loadDashboard}
-                className="mt-2 type-ui-sm text-[#1A3022] underline hover:no-underline"
+                className="mt-2 type-ui-sm text-[#1A3022] underline hover:no-underline btn-motion"
               >
                 Coba muat ulang
               </button>
             )}
-          </div>
+          </Reveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <RevealGrid className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
             {loading && !dashboard && (
               <>
                 {[1, 2, 3].map((i) => (
@@ -124,10 +126,10 @@ const Home = ({ user }) => {
                 <StatsCard title="Total Setor" value="—" icon="📦" sub="Data tidak tersedia" color="bg-white" />
               </>
             )}
-          </div>
+          </RevealGrid>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            <div className="lg:col-span-2 bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
+          <Reveal delay={120} className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <div className="lg:col-span-2 bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm card-interactive">
               <h3 className="type-section-title mb-8">Aktivitas Setor — 7 Hari Terakhir</h3>
               {loading ? (
                 <div className="h-56 bg-gray-50 rounded-2xl animate-pulse" />
@@ -165,7 +167,7 @@ const Home = ({ user }) => {
               )}
             </div>
 
-            <div className="bg-[#1A3022] p-8 rounded-[32px] text-white shadow-xl">
+            <div className="bg-[#1A3022] p-8 rounded-[32px] text-white shadow-xl card-interactive">
               <h3 className="type-section-title text-white mb-6">Aksi Cepat</h3>
               <div className="space-y-4">
                 <div
@@ -200,10 +202,10 @@ const Home = ({ user }) => {
                 </div>
               </div>
             </div>
-          </div>
+          </Reveal>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
+          <RevealGrid className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm card-interactive">
               <h3 className="type-section-title mb-6">Challenge Aktif</h3>
               <div className="space-y-4">
                 {loading && <p className="text-sm text-gray-400">Memuat…</p>}
@@ -230,7 +232,7 @@ const Home = ({ user }) => {
               </div>
             </div>
 
-            <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
+            <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm card-interactive">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="type-section-title">Aktivitas Terakhir</h3>
                 <button
@@ -271,7 +273,7 @@ const Home = ({ user }) => {
                 })}
               </div>
             </div>
-          </div>
+          </RevealGrid>
         </main>
       </div>
     </div>

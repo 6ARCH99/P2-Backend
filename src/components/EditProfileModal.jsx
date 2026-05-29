@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { api, setAuth } from '../services/api.js';
+import { api, setAuth, getImageUrl } from '../services/api.js';
 
 const EditProfileModal = ({ isOpen, onClose, profile, onSaved }) => {
   const [form, setForm] = useState({
@@ -10,6 +10,9 @@ const EditProfileModal = ({ isOpen, onClose, profile, onSaved }) => {
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState('');
+  const fileInputRef = React.useRef(null);
 
   useEffect(() => {
     if (isOpen && profile) {
@@ -20,10 +23,29 @@ const EditProfileModal = ({ isOpen, onClose, profile, onSaved }) => {
       });
       setErrors({});
       setSubmitError('');
+      setPhotoFile(null);
+      setPhotoPreview(profile.profilePhotoUrl || '');
     }
   }, [isOpen, profile]);
 
   if (!isOpen) return null;
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        setSubmitError('File harus berupa gambar (JPEG, PNG, dll).');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setSubmitError('Ukuran gambar maksimal 5MB.');
+        return;
+      }
+      setPhotoFile(file);
+      setPhotoPreview(URL.createObjectURL(file));
+      setSubmitError('');
+    }
+  };
 
   const validate = () => {
     const next = {};
@@ -47,12 +69,19 @@ const EditProfileModal = ({ isOpen, onClose, profile, onSaved }) => {
 
     setLoading(true);
     try {
+      let finalProfilePhotoUrl = profile?.profilePhotoUrl;
+      if (photoFile) {
+        const photoRes = await api.uploadProfilePhoto(photoFile);
+        finalProfilePhotoUrl = photoRes.data.profilePhotoUrl;
+      }
+
       const res = await api.updateProfile({
         fullName: form.fullName.trim(),
         phone: form.phone.trim(),
         address: form.address.trim(),
       });
-      const updated = res.data;
+      const updated = { ...res.data, profilePhotoUrl: finalProfilePhotoUrl };
+      
       const token = localStorage.getItem('suarabumi_token');
       if (token) {
         setAuth(token, {
@@ -74,14 +103,14 @@ const EditProfileModal = ({ isOpen, onClose, profile, onSaved }) => {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm modal-backdrop"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="edit-profile-title"
     >
       <div
-        className="bg-white w-full max-w-lg rounded-[32px] shadow-2xl border border-gray-100 overflow-hidden"
+        className="bg-white w-full max-w-lg rounded-[32px] shadow-2xl border border-gray-100 overflow-hidden modal-panel"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-8 pt-8 pb-4 border-b border-gray-50">
@@ -105,6 +134,35 @@ const EditProfileModal = ({ isOpen, onClose, profile, onSaved }) => {
           {submitError && (
             <p className="text-red-600 text-xs font-bold bg-red-50 p-3 rounded-xl">{submitError}</p>
           )}
+
+          <div className="flex flex-col items-center mb-4">
+            <div className="relative">
+              <div className="w-24 h-24 bg-[#2D4A37] rounded-full flex items-center justify-center overflow-hidden shadow-sm border-4 border-white">
+                {photoPreview ? (
+                  <img src={getImageUrl(photoPreview)} alt="Profile Preview" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-white text-3xl font-bold font-heading">
+                    {form.fullName.charAt(0) || 'U'}
+                  </span>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute bottom-0 right-0 w-8 h-8 bg-[#D99A29] text-white rounded-full flex items-center justify-center border-2 border-white shadow-sm hover:scale-105 transition-transform"
+                title="Ganti Foto"
+              >
+                📷
+              </button>
+            </div>
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={handlePhotoChange}
+            />
+          </div>
 
           <div className="text-left">
             <label className="text-[10px] font-bold text-[#1A3022] uppercase tracking-widest block mb-2">
@@ -183,7 +241,7 @@ const EditProfileModal = ({ isOpen, onClose, profile, onSaved }) => {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 py-3.5 rounded-xl bg-[#1A3022] text-white text-sm font-bold hover:opacity-90 transition-all disabled:opacity-60"
+              className="flex-1 py-3.5 rounded-xl bg-[#1A3022] text-white text-sm font-bold btn-motion disabled:opacity-60"
             >
               {loading ? 'Menyimpan…' : 'Simpan Perubahan'}
             </button>
