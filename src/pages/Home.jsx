@@ -140,23 +140,32 @@ const Home = ({ user }) => {
                       <span key={t}>{Math.round(t)}</span>
                     ))}
                   </div>
-                  <div className="relative flex-1">
-                    <div className="absolute inset-0 flex flex-col justify-between pb-8">
-                      {ticks.map((t) => (
-                        <div key={t} className="border-t border-gray-100 w-full" />
-                      ))}
+                  <div className="relative flex-1 flex flex-col">
+                    <div className="relative flex-1">
+                      <div className="absolute inset-0 flex flex-col justify-between">
+                        {ticks.map((t) => (
+                          <div key={t} className="border-t border-gray-100 w-full" />
+                        ))}
+                      </div>
+                      <div className="absolute inset-0 flex items-end justify-between px-2">
+                        {chart.map((day, i) => (
+                          <div key={i} className="flex justify-center items-end w-full h-full z-10">
+                            <div
+                              className="w-10 bg-[#6BA67E] rounded-t-lg transition-all hover:bg-[#2D4A37] cursor-pointer"
+                              title={`${day.depositCount} setor`}
+                              style={{
+                                height: `${(day.depositCount / maxTick) * 100}%`,
+                                minHeight: day.depositCount ? '4px' : '0px',
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    <div className="relative flex items-end justify-between h-full px-2 pb-8">
+                    <div className="h-8 flex justify-between px-2 pt-3 items-start">
                       {chart.map((day, i) => (
-                        <div key={i} className="flex flex-col items-center gap-3 w-full">
-                          <div
-                            className="w-10 bg-[#6BA67E] rounded-t-lg transition-all hover:bg-[#2D4A37] cursor-pointer"
-                            style={{
-                              height: `${(day.depositCount / maxTick) * 100}%`,
-                              minHeight: day.depositCount ? '8%' : '4%',
-                            }}
-                          />
-                          <span className="type-caption-bold text-gray-400 uppercase">{day.label}</span>
+                        <div key={i} className="flex justify-center w-full">
+                          <span className="type-caption-bold text-gray-400 uppercase text-[10px] tracking-wider">{day.label}</span>
                         </div>
                       ))}
                     </div>

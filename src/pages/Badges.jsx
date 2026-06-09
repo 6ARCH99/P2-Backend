@@ -2,16 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '../services/api.js';
 import ApiStatusBanner from '../components/ApiStatusBanner.jsx';
 
-const DUMMY_LOCKED_BADGES = [
-  { id: 'l1', icon: '🌍', name: 'Earth Savior', description: 'Kumpulkan 1000 poin', progressHint: '420/1000 poin' },
-  { id: 'l2', icon: '♻️', name: 'Recycle Master', description: 'Daur ulang 50kg sampah', progressHint: '18/50 kg' },
-  { id: 'l3', icon: '🌱', name: 'Green Influencer', description: 'Ajak 5 teman bergabung', progressHint: '2/5 teman' },
-  { id: 'l4', icon: '🔥', name: 'Streak 30 Hari', description: 'Aktif 30 hari berturut-turut', progressHint: '12/30 hari' },
-  { id: 'l5', icon: '🏅', name: 'Top 10 Weekly', description: 'Masuk peringkat 10 besar mingguan', progressHint: 'Peringkat saat ini: #24' },
-  { id: 'l6', icon: '💎', name: 'Diamond Collector', description: 'Kumpulkan 5000 poin total', progressHint: '1200/5000 poin' },
-  { id: 'l7', icon: '🌳', name: 'Tree Planter', description: 'Selamatkan 100kg CO₂', progressHint: '34/100 kg CO₂' },
-  { id: 'l8', icon: '⭐', name: 'Super Star', description: 'Selesaikan 10 challenge', progressHint: '3/10 challenge' },
-];
+// DUMMY_LOCKED_BADGES removed - now using real API data only
+// If API returns no locked badges, empty state will be shown
 
 const Badges = () => {
   const [earned, setEarned] = useState([]);
@@ -153,7 +145,12 @@ const Badges = () => {
               ))}
             </>
           )}
-          {!loading && (locked.length > 0 ? locked : DUMMY_LOCKED_BADGES).map((badge) => (
+          {!loading && locked.length === 0 && (
+            <div className="bg-white/60 rounded-[20px] p-8 border border-dashed border-gray-200 text-center col-span-2 md:col-span-4">
+              <p className="text-sm text-gray-500">Tidak ada badge terkunci. Anda sudah mengumpulkan semua badge!</p>
+            </div>
+          )}
+          {!loading && locked.map((badge) => (
             <div key={badge.id} className="bg-white/60 rounded-[20px] p-5 border border-dashed border-gray-200 text-center relative group hover:border-gray-300 hover:bg-white/80 transition-all duration-300">
               {/* Lock overlay icon */}
               <div className="absolute top-3 right-3 w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-[10px] group-hover:bg-orange-100 group-hover:text-orange-500 transition-colors">

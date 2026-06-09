@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import LogoDaurin from '../assets/Logo Daurin.jpeg';
 import { api, setAuth } from '../services/api.js';
-import Reveal from '../components/motion/Reveal.jsx';
 
 const LoginPage = ({ onBack, onLoginSuccess, onGoToRegister }) => {
   const [email, setEmail] = useState('');
@@ -9,6 +8,10 @@ const LoginPage = ({ onBack, onLoginSuccess, onGoToRegister }) => {
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotMessage, setForgotMessage] = useState('');
 
   const navigateToSection = (sectionId) => {
     onBack();
@@ -61,6 +64,51 @@ const LoginPage = ({ onBack, onLoginSuccess, onGoToRegister }) => {
     }
   };
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setForgotMessage('');
+    if (!forgotEmail || !/\S+@\S+\.\S+/.test(forgotEmail)) {
+      setForgotMessage('Masukkan email yang valid');
+      return;
+    }
+    setForgotLoading(true);
+    try {
+      await api.forgotPassword(forgotEmail);
+      setForgotMessage('Link reset password telah dikirim ke email Anda');
+      setForgotEmail('');
+    } catch (err) {
+      setForgotMessage(err.message || 'Gagal mengirim link reset password');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = () => {
+    // Redirect to Google OAuth or open popup
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      setSubmitError('Google login belum dikonfigurasi');
+      return;
+    }
+    const redirectUri = `${window.location.origin}/oauth/callback/google`;
+    const scope = 'openid email profile';
+    const state = btoa(JSON.stringify({ action: 'login', nonce: Date.now() }));
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token id_token&scope=${encodeURIComponent(scope)}&state=${encodeURIComponent(state)}&nonce=${Date.now()}`;
+    window.location.href = url;
+  };
+
+  const handleFacebookLogin = () => {
+    const appId = import.meta.env.VITE_FACEBOOK_APP_ID;
+    if (!appId) {
+      setSubmitError('Facebook login belum dikonfigurasi');
+      return;
+    }
+    const redirectUri = `${window.location.origin}/oauth/callback/facebook`;
+    const state = btoa(JSON.stringify({ action: 'login', nonce: Date.now() }));
+    const url = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${encodeURIComponent(state)}&scope=email,public_profile`;
+    window.location.href = url;
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F5F0] font-sans text-left">
       <nav className="animate-nav flex justify-between items-center px-10 py-6 bg-white/50 backdrop-blur-sm">
@@ -98,7 +146,7 @@ const LoginPage = ({ onBack, onLoginSuccess, onGoToRegister }) => {
           ← Kembali ke Beranda
         </button>
 
-        <Reveal variant="scale" className="flex flex-col items-center w-full">
+        <div className="flex flex-col items-center w-full">
           <h2 className="text-4xl font-bold text-[#1A3022] mb-2 font-heading">Selamat Datang Kembali!</h2>
           <p className="text-gray-500 text-sm mb-10">Lanjutkan perjalanan aksi iklimmu bersama Daurin</p>
 
@@ -140,7 +188,7 @@ const LoginPage = ({ onBack, onLoginSuccess, onGoToRegister }) => {
                 </div>
                 {errors.password && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.password}</p>}
                 <div className="text-right mt-2">
-                  <button type="button" className="text-[10px] font-bold text-gray-400 uppercase hover:text-[#2D6A4F]">Lupa password?</button>
+                  <button type="button" onClick={() => setShowForgotModal(true)} className="text-[10px] font-bold text-gray-400 uppercase hover:text-[#2D6A4F]">Lupa password?</button>
                 </div>
               </div>
 
@@ -159,11 +207,11 @@ const LoginPage = ({ onBack, onLoginSuccess, onGoToRegister }) => {
             </div>
 
             <div className="space-y-3">
-              <button type="button" className="w-full flex items-center justify-center gap-3 border border-gray-200 py-3 rounded-xl hover:bg-gray-50 transition-all text-sm font-bold text-gray-600">
+              <button type="button" onClick={handleGoogleLogin} className="w-full flex items-center justify-center gap-3 border border-gray-200 py-3 rounded-xl hover:bg-gray-50 transition-all text-sm font-bold text-gray-600">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
                 Masuk dengan Google
               </button>
-              <button type="button" className="w-full flex items-center justify-center gap-3 bg-[#1877F2] text-white py-3 rounded-xl hover:opacity-90 transition-all text-sm font-bold">
+              <button type="button" onClick={handleFacebookLogin} className="w-full flex items-center justify-center gap-3 bg-[#1877F2] text-white py-3 rounded-xl hover:opacity-90 transition-all text-sm font-bold">
                 <span className="bg-white text-[#1877F2] rounded-full w-5 h-5 flex items-center justify-center text-[10px]">f</span>
                 Masuk dengan Facebook
               </button>
@@ -175,8 +223,58 @@ const LoginPage = ({ onBack, onLoginSuccess, onGoToRegister }) => {
               </p>
             </div>
           </div>
-        </Reveal>
+        </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-md rounded-[32px] shadow-2xl border p-8">
+            <h2 className="text-2xl font-bold text-[#1A3022] mb-4">Lupa Password?</h2>
+            <p className="text-sm text-gray-500 mb-6">
+              Masukkan email Anda dan kami akan mengirimkan link untuk reset password.
+            </p>
+            {forgotMessage && (
+              <p className={`text-sm mb-4 p-3 rounded-xl ${forgotMessage.includes('berhasil') || forgotMessage.includes('telah dikirim') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+                {forgotMessage}
+              </p>
+            )}
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-[#1A3022] mb-2">Email</label>
+                <input
+                  type="email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  placeholder="nama@email.com"
+                  className="w-full bg-[#F5F5F0] border border-transparent rounded-xl px-4 py-3 text-sm focus:border-[#2D6A4F] outline-none"
+                  required
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={forgotLoading}
+                  className="flex-1 bg-[#1A3022] text-white py-3 rounded-xl font-bold text-sm hover:opacity-90 transition-all disabled:opacity-60"
+                >
+                  {forgotLoading ? 'Mengirim...' : 'Kirim Link Reset'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowForgotModal(false);
+                    setForgotEmail('');
+                    setForgotMessage('');
+                  }}
+                  className="flex-1 border border-gray-200 py-3 rounded-xl font-bold text-sm hover:bg-gray-50 transition-all"
+                >
+                  Batal
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

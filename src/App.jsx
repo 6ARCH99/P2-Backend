@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { clearAuth, getStoredUser } from './services/api.js';
+import { clearAuth, getStoredUser, setAuth } from './services/api.js';
 import AnimatedPage from './components/motion/AnimatedPage.jsx';
 import AnimatedRoute from './components/motion/AnimatedRoute.jsx';
 
@@ -24,6 +24,8 @@ import PenjemputanPage from './pages/PenjemputanPage';
 import ImpactPage from './pages/ImpactPage'; 
 import DropPointPage from './pages/DropPointPage'; 
 import Leaderboard from './pages/Leaderboard'; 
+import TermsPage from './pages/TermsPage';
+import PrivacyPage from './pages/PrivacyPage';
 // --- IMPORT PAGE BARU ---
 import Badges from './pages/Badges'; 
 
@@ -209,6 +211,16 @@ function App() {
             <Route 
               path="/settings/password" 
               element={isLoggedIn ? <AnimatedRoute><ForgotPassword onBack={() => window.history.back()} /></AnimatedRoute> : <Navigate to="/" />} 
+            />
+
+            {/* 4. ROUTE TERMS & PRIVACY */}
+            <Route 
+              path="/terms" 
+              element={<TermsPage onClose={() => window.history.back()} />} 
+            />
+            <Route 
+              path="/privacy" 
+              element={<PrivacyPage onClose={() => window.history.back()} />} 
             />
             
             <Route path="*" element={<Navigate to="/" />} />

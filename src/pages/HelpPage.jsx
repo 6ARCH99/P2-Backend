@@ -34,9 +34,16 @@ const HelpPage = ({ onBack }) => {
   const handleChat = async () => {
     try {
       const res = await api.startLiveChat();
-      window.open(res.data.widgetUrl, '_blank', 'noopener');
+      if (res.data?.widgetUrl) {
+        window.open(res.data.widgetUrl, '_blank', 'noopener,noreferrer');
+      } else if (res.data?.sessionId) {
+        // If no widget URL, open a chat page with the session
+        window.open(`/chat?session=${res.data.sessionId}`, '_blank', 'noopener,noreferrer');
+      } else {
+        setError('Live chat tidak tersedia saat ini. Silakan kirim tiket email.');
+      }
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Gagal memulai live chat. Silakan coba lagi atau kirim tiket email.');
     }
   };
 
@@ -109,7 +116,7 @@ const HelpPage = ({ onBack }) => {
 
         <div className="bg-[#1A3022] rounded-[32px] p-8 text-white">
           <h3 className="text-xl font-bold mb-2">Butuh Bantuan Lebih Lanjut?</h3>
-          <p className="text-green-100/70 text-sm mb-8">Live chat (stub) atau kirim tiket</p>
+          <p className="text-green-100/70 text-sm mb-8">Chat langsung atau kirim tiket support</p>
           <div className="flex flex-col md:flex-row gap-4">
             <button type="button" onClick={handleChat} className="flex-1 bg-white text-[#1A3022] py-4 rounded-xl font-bold text-sm">
               Chat Kami

@@ -1,6 +1,129 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Search, Navigation2, Filter, MapPin } from 'lucide-react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
+import { Search, Navigation2, Filter, MapPin, X } from 'lucide-react';
 import { api } from '../services/api';
+
+// Simple Interactive Map Component using OpenStreetMap tiles
+const InteractiveMap = ({ dropPoints, userLocation, onMarkerClick }) => {
+  const mapRef = useRef(null);
+  const [mapInstance, setMapInstance] = useState(null);
+  const [selectedPoint, setSelectedPoint] = useState(null);
+  const [mapError, setMapError] = useState(null);
+
+  useEffect(() => {
+    // Dynamic import of Leaflet
+    const initMap = async () => {
+      try {
+        const L = await import('leaflet');
+        await import('leaflet/dist/leaflet.css');
+
+        if (!mapRef.current) return;
+
+        // Fix default icon paths
+        delete L.Icon.Default.prototype._getIconUrl;
+        L.Icon.Default.mergeOptions({
+          iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+          iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+        });
+
+        const center = userLocation 
+          ? [userLocation.lat, userLocation.lng] 
+          : [-6.2088, 106.8456]; // Default to Jakarta
+
+        const map = L.map(mapRef.current).setView(center, 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors',
+          maxZoom: 19,
+        }).addTo(map);
+
+        // Add user location marker
+        if (userLocation) {
+          const userIcon = L.divIcon({
+            className: 'custom-user-marker',
+            html: `<div style="background-color: #1A3022; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>`,
+            iconSize: [16, 16],
+            iconAnchor: [8, 8],
+          });
+          L.marker([userLocation.lat, userLocation.lng], { icon: userIcon }).addTo(map).bindPopup('Lokasi Anda');
+        }
+
+        // Add drop point markers
+        const markers = [];
+        dropPoints.forEach((dp, index) => {
+          if (dp.lat && dp.lng) {
+            const marker = L.marker([dp.lat, dp.lng])
+              .addTo(map)
+              .bindPopup(`<b>${dp.name}</b><br/>${dp.address}<br/>${dp.isOpen ? 'Buka' : 'Tutup'}`);
+            marker.on('click', () => {
+              setSelectedPoint(dp);
+            });
+            markers.push({ marker, data: dp });
+          }
+        });
+
+        setMapInstance({ map, markers, L });
+      } catch (err) {
+        console.error('Failed to load map:', err);
+        setMapError('Gagal memuat peta. Silakan coba lagi.');
+      }
+    };
+
+    initMap();
+
+    return () => {
+      if (mapInstance?.map) {
+        mapInstance.map.remove();
+      }
+    };
+  }, [dropPoints, userLocation]);
+
+  const handlePointAction = (action) => {
+    if (!selectedPoint) return;
+    if (action === 'directions') {
+      onMarkerClick(selectedPoint);
+    }
+    setSelectedPoint(null);
+  };
+
+  if (mapError) {
+    return (
+      <div className="w-full h-[500px] bg-red-50 rounded-[24px] border border-red-200 flex flex-col items-center justify-center gap-3 p-6">
+        <MapPin className="w-12 h-12 text-red-400" strokeWidth={1.5} />
+        <p className="font-display text-xl font-semibold text-red-700">Gagal Memuat Peta</p>
+        <p className="font-sans text-sm text-red-500">{mapError}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full h-[500px] rounded-[24px] overflow-hidden border border-gray-200">
+      <div ref={mapRef} className="w-full h-full" />
+      
+      {/* Selected Point Info Panel */}
+      {selectedPoint && (
+        <div className="absolute bottom-4 left-4 right-4 bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
+          <div className="flex justify-between items-start mb-2">
+            <h3 className="font-bold text-[#1A3022] text-sm">{selectedPoint.name}</h3>
+            <button 
+              onClick={() => setSelectedPoint(null)}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <p className="text-xs text-gray-500 mb-3">{selectedPoint.address}</p>
+          <button
+            onClick={() => handlePointAction('directions')}
+            className="w-full bg-[#1A3022] text-white py-2 rounded-xl text-xs font-bold"
+          >
+            Lihat Petunjuk Arah
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const MATERIALS = [
   { id: 'all', label: 'Semua', api: '' },
@@ -233,11 +356,11 @@ const DropPointPage = () => {
                 )}
               </div>
             ) : (
-              <div className="w-full h-[500px] bg-[#E8E8E0] rounded-[24px] border border-gray-200 flex flex-col items-center justify-center gap-3 p-6">
-                <MapPin className="w-12 h-12 text-[#1A3022]/40" strokeWidth={1.5} />
-                <p className="font-display text-xl font-semibold text-[#1A3022]">Peta Interaktif</p>
-                <p className="font-sans text-sm text-gray-500">Lihat lokasi drop point di sekitarmu</p>
-              </div>
+              <InteractiveMap 
+                dropPoints={dropPoints} 
+                userLocation={coords}
+                onMarkerClick={(dp) => window.open(mapsUrl(dp), '_blank')}
+              />
             )}
           </div>
 

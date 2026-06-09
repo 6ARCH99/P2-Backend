@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { api } from '../services/api.js';
 
-// TAMBAHKAN: onGoToPreference dan onGoToHelp ke dalam props
 const SettingsPage = ({ 
   onLogout, 
   onChangePassword, 
@@ -8,6 +8,23 @@ const SettingsPage = ({
   onGoToPreference, 
   onGoToHelp 
 }) => {
+  const [accountStatus, setAccountStatus] = useState(null);
+  const [loadingStatus, setLoadingStatus] = useState(true);
+
+  useEffect(() => {
+    const loadAccountStatus = async () => {
+      try {
+        const res = await api.getAccountStatus();
+        setAccountStatus(res.data);
+      } catch (err) {
+        console.error('Failed to load account status:', err);
+      } finally {
+        setLoadingStatus(false);
+      }
+    };
+    loadAccountStatus();
+  }, []);
+
   const settingsMenus = [
     {
       id: 'password',
@@ -31,7 +48,6 @@ const SettingsPage = ({
       desc: 'Sesuaikan pengalaman Anda',
       icon: '⚖️',
       bgColor: 'bg-blue-50',
-      // UBAH: Sekarang menggunakan navigasi asli
       onClick: onGoToPreference 
     },
     {
@@ -40,7 +56,6 @@ const SettingsPage = ({
       desc: 'FAQ dan dukungan',
       icon: '❓',
       bgColor: 'bg-purple-50',
-      // UBAH: Sekarang menggunakan navigasi asli
       onClick: onGoToHelp 
     }
   ];
@@ -95,12 +110,19 @@ const SettingsPage = ({
                 </div>
                 <div>
                   <h4 className="font-bold text-[#1A3022] text-sm">Status Akun</h4>
-                  <p className="text-gray-400 text-xs">Aktif sejak Januari 2026</p>
+                  <p className="text-gray-400 text-xs">
+                    {loadingStatus 
+                      ? 'Memuat...' 
+                      : accountStatus?.memberSince 
+                        ? `Aktif sejak ${new Date(accountStatus.memberSince).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}`
+                        : 'Aktif'
+                    }
+                  </p>
                 </div>
               </div>
-              <div className="bg-green-50 text-green-700 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 border border-green-100">
-                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-                Verified
+              <div className={`${loadingStatus ? 'bg-gray-50 text-gray-500' : accountStatus?.verified ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-700'} px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 border ${loadingStatus ? 'border-gray-100' : accountStatus?.verified ? 'border-green-100' : 'border-yellow-100'}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${loadingStatus ? 'bg-gray-400' : accountStatus?.verified ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'} `}></span>
+                {loadingStatus ? 'Memuat...' : accountStatus?.verified ? 'Verified' : 'Belum Verifikasi'}
               </div>
             </div>
 
@@ -123,3 +145,4 @@ const SettingsPage = ({
 };
 
 export default SettingsPage;
+```

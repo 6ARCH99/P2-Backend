@@ -3,6 +3,54 @@ import { api } from '../services/api.js';
 import ApiStatusBanner from '../components/ApiStatusBanner.jsx';
 import ContributionLineChart from '../components/ContributionLineChart.jsx';
 
+// Share buttons component
+const ShareButtons = ({ impact }) => {
+  const handleShareWhatsApp = () => {
+    if (!impact) return;
+    const message = `Aku sudah menyelamatkan lingkungan setara dengan menanam ${impact.treesEquivalent} pohon! 🌳 \n\nBergabunglah dengan Daurin dan tunjukkan dampak positifmu juga! #TunasAction #ClimateHero`;
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+  };
+
+  const handleShareTwitter = () => {
+    if (!impact) return;
+    const text = `Aku sudah menyelamatkan lingkungan setara dengan menanam ${impact.treesEquivalent} pohon! 🌳 Bergabunglah dengan @DaurinApp dan tunjukkan dampak positifmu! #TunasAction #ClimateHero`;
+    const encodedText = encodeURIComponent(text);
+    window.open(`https://twitter.com/intent/tweet?text=${encodedText}`, '_blank');
+  };
+
+  const handleShareInstagram = () => {
+    if (!impact) return;
+    const message = `Aku sudah menyelamatkan lingkungan setara dengan menanam ${impact.treesEquivalent} pohon! 🌳\n\nBergabunglah dengan Daurin dan tunjukkan dampak positifmu! #TunasAction #ClimateHero #Daurin`;
+    navigator.clipboard.writeText(message).then(() => {
+      alert('Pesan disalin. Silakan buka Instagram dan bagikan di story atau post Anda.');
+    }).catch(() => {
+      alert('Gagal menyalin pesan. Coba secara manual.');
+    });
+  };
+
+  const buttons = [
+    { name: 'WhatsApp', color: 'bg-[#25D366] text-white', onClick: handleShareWhatsApp },
+    { name: 'Instagram', color: 'bg-gradient-to-r from-[#f09433] to-[#bc1888] text-white', onClick: handleShareInstagram },
+    { name: 'Twitter', color: 'bg-[#1DA1F2] text-white', onClick: handleShareTwitter },
+  ];
+
+  return (
+    <>
+      {buttons.map((s) => (
+        <button
+          key={s.name}
+          type="button"
+          onClick={s.onClick}
+          className={`${s.color} px-5 py-2.5 rounded-xl text-xs font-bold hover:opacity-90 transition-opacity`}
+        >
+          {s.name}
+        </button>
+      ))}
+    </>
+  );
+};
+
 const ImpactPage = () => {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
@@ -20,6 +68,31 @@ const ImpactPage = () => {
   const trend = data?.contributionTrend6Months;
   const comparison = data?.comparison;
   const rank = data?.communityRank;
+
+  const handleShareWhatsApp = () => {
+    if (!impact) return;
+    const message = `Aku sudah menyelamatkan lingkungan setara dengan menanam ${impact.treesEquivalent} pohon! 🌳 \n\nBergabunglah dengan Daurin dan tunjukkan dampak positifmu juga! #TunasAction #ClimateHero`;
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+  };
+
+  const handleShareTwitter = () => {
+    if (!impact) return;
+    const text = `Aku sudah menyelamatkan lingkungan setara dengan menanam ${impact.treesEquivalent} pohon! 🌳 Bergabunglah dengan @DaurinApp dan tunjukkan dampak positifmu! #TunasAction #ClimateHero`;
+    const encodedText = encodeURIComponent(text);
+    window.open(`https://twitter.com/intent/tweet?text=${encodedText}`, '_blank');
+  };
+
+  const handleShareInstagram = () => {
+    if (!impact) return;
+    const message = `Aku sudah menyelamatkan lingkungan setara dengan menanam ${impact.treesEquivalent} pohon! 🌳\n\nBergabunglah dengan Daurin dan tunjukkan dampak positifmu! #TunasAction #ClimateHero #Daurin`;
+    // Instagram doesn't have a direct share URL, so copy to clipboard instead
+    navigator.clipboard.writeText(message).then(() => {
+      alert('Pesan disalin. Silakan buka Instagram dan bagikan di story atau post Anda.');
+    }).catch(() => {
+      alert('Gagal menyalin pesan. Coba secara manual.');
+    });
+  };
 
   const metrics = impact
     ? [
@@ -213,19 +286,7 @@ const ImpactPage = () => {
             </p>
 
             <div className="flex flex-wrap gap-3">
-              {[
-                { name: 'WhatsApp', color: 'bg-[#25D366] text-white' },
-                { name: 'Instagram', color: 'bg-gradient-to-r from-[#f09433] to-[#bc1888] text-white' },
-                { name: 'Twitter', color: 'bg-[#1DA1F2] text-white' },
-              ].map((s) => (
-                <button
-                  key={s.name}
-                  type="button"
-                  className={`${s.color} px-5 py-2.5 rounded-xl text-xs font-bold hover:opacity-90 transition-opacity`}
-                >
-                  {s.name}
-                </button>
-              ))}
+              <ShareButtons impact={impact} />
             </div>
           </article>
         </section>

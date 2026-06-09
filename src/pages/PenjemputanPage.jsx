@@ -23,6 +23,7 @@ const PenjemputanPage = () => {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ date: '', time: '', address: '', weight: '' });
+  const [editingId, setEditingId] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -51,12 +52,23 @@ const PenjemputanPage = () => {
     setSubmitting(true);
     setError('');
     try {
-      await api.createPickup({
-        address: form.address,
-        scheduledAt,
-        estimatedWeightKg: Number(form.weight),
-      });
+      if (editingId) {
+        // Update existing pickup
+        await api.updatePickup(editingId, {
+          address: form.address,
+          scheduledAt,
+          estimatedWeightKg: Number(form.weight),
+        });
+      } else {
+        // Create new pickup
+        await api.createPickup({
+          address: form.address,
+          scheduledAt,
+          estimatedWeightKg: Number(form.weight),
+        });
+      }
       setIsModalOpen(false);
+      setEditingId(null);
       setForm({ date: '', time: '', address: '', weight: '' });
       await load();
     } catch (err) {
@@ -64,6 +76,20 @@ const PenjemputanPage = () => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleOpenEditModal = (pickup) => {
+    const d = new Date(pickup.scheduledAt);
+    const date = d.toISOString().split('T')[0];
+    const time = d.toTimeString().slice(0, 5);
+    setForm({
+      date,
+      time,
+      address: pickup.address,
+      weight: String(pickup.estimatedWeightKg),
+    });
+    setEditingId(pickup.id);
+    setIsModalOpen(true);
   };
 
   const handleCancel = async (id) => {
@@ -151,7 +177,7 @@ const PenjemputanPage = () => {
                   {item.status === 'scheduled' && (
                     <button
                       type="button"
-                      onClick={() => setIsModalOpen(true)}
+                      onClick={() => handleOpenEditModal(item)}
                       className="w-full bg-[#1A3022] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#2d4a37]"
                     >
                       Ubah Jadwal
@@ -180,7 +206,11 @@ const PenjemputanPage = () => {
       {isModalOpen && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm modal-backdrop"
-          onClick={() => setIsModalOpen(false)}
+          onClick={() => {
+            setIsModalOpen(false);
+            setEditingId(null);
+            setForm({ date: '', time: '', address: '', weight: '' });
+          }}
           role="dialog"
           aria-modal="true"
         >
@@ -189,7 +219,9 @@ const PenjemputanPage = () => {
             onClick={(e) => e.stopPropagation()}
             onSubmit={handleCreate}
           >
-            <h2 className="type-section-title-lg text-[#1A3022] mb-8">Jadwal Penjemputan Baru</h2>
+            <h2 className="type-section-title-lg text-[#1A3022] mb-8">
+              {editingId ? 'Edit Jadwal Penjemputan' : 'Jadwal Penjemputan Baru'}
+            </h2>
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
                 <label className="block text-sm font-bold mb-2">Pilih Tanggal</label>
@@ -241,11 +273,15 @@ const PenjemputanPage = () => {
                 disabled={submitting}
                 className="flex-1 bg-[#1A3022] text-white py-3.5 rounded-xl font-bold disabled:opacity-50"
               >
-                {submitting ? 'Menyimpan…' : 'Konfirmasi Jadwal'}
+                {submitting ? 'Menyimpan…' : editingId ? 'Simpan Perubahan' : 'Konfirmasi Jadwal'}
               </button>
               <button
                 type="button"
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setEditingId(null);
+                  setForm({ date: '', time: '', address: '', weight: '' });
+                }}
                 className="flex-1 border py-3.5 rounded-xl font-bold"
               >
                 Batal

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import LogoDaurin from '../assets/Logo Daurin.jpeg';
 import { api, setAuth } from '../services/api.js';
-import Reveal from '../components/motion/Reveal.jsx';
 
 const RegisterPage = ({ onBack, onGoToLogin, onContinue, onRegisterSuccess }) => {
   const [formData, setFormData] = useState({
@@ -79,6 +78,39 @@ const RegisterPage = ({ onBack, onGoToLogin, onContinue, onRegisterSuccess }) =>
     }
   };
 
+  const handleGoogleLogin = () => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      alert('Google login belum dikonfigurasi');
+      return;
+    }
+    const redirectUri = `${window.location.origin}/oauth/callback/google`;
+    const scope = 'openid email profile';
+    const state = btoa(JSON.stringify({ action: 'register', nonce: Date.now() }));
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token id_token&scope=${encodeURIComponent(scope)}&state=${encodeURIComponent(state)}&nonce=${Date.now()}`;
+    window.location.href = url;
+  };
+
+  const handleFacebookLogin = () => {
+    const appId = import.meta.env.VITE_FACEBOOK_APP_ID;
+    if (!appId) {
+      alert('Facebook login belum dikonfigurasi');
+      return;
+    }
+    const redirectUri = `${window.location.origin}/oauth/callback/facebook`;
+    const state = btoa(JSON.stringify({ action: 'register', nonce: Date.now() }));
+    const url = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${encodeURIComponent(state)}&scope=email,public_profile`;
+    window.location.href = url;
+  };
+
+  const openTerms = () => {
+    window.location.href = '/terms';
+  };
+
+  const openPrivacy = () => {
+    window.location.href = '/privacy';
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F5F0] font-sans pb-20">
       {/* Navbar Minimalis - Tetap sesuai codingan awal */}
@@ -107,16 +139,16 @@ const RegisterPage = ({ onBack, onGoToLogin, onContinue, onRegisterSuccess }) =>
       </nav>
 
       {/* Header Halaman */}
-      <Reveal className="text-center mt-10 mb-8 px-6">
+      <div className="text-center mt-10 mb-8 px-6">
         <span className="bg-[#D8E6DC] text-[#2D6A4F] text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest">
           Langkah 1 dari 2
         </span>
         <h1 className="text-5xl font-bold text-[#1A3022] mt-6 mb-4 font-heading leading-tight">Buat Akun Tunas</h1>
         <p className="text-gray-500 text-sm">Bergabunglah dengan ribuan pengguna yang sudah bergerak untuk lingkungan</p>
-      </Reveal>
+      </div>
 
       <div className="max-w-3xl mx-auto px-6">
-        <Reveal variant="scale" delay={80} className="bg-white rounded-[40px] shadow-sm p-8 md:p-12 border border-gray-100 card-interactive">
+        <div className="bg-white rounded-[40px] shadow-sm p-8 md:p-12 border border-gray-100 card-interactive">
           <form onSubmit={handleSubmit} className="space-y-6">
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -198,7 +230,7 @@ const RegisterPage = ({ onBack, onGoToLogin, onContinue, onRegisterSuccess }) =>
 
             <div className="bg-[#D8E6DC] p-4 rounded-xl text-center">
               <p className="text-[11px] text-[#1A3022]">
-                Saya setuju dengan <span className="font-bold underline cursor-pointer">Syarat & Ketentuan</span> dan <span className="font-bold underline cursor-pointer">Kebijakan Privasi</span> Tunas
+                Saya setuju dengan <button type="button" onClick={openTerms} className="font-bold underline cursor-pointer hover:text-[#2D6A4F]">Syarat & Ketentuan</button> dan <button type="button" onClick={openPrivacy} className="font-bold underline cursor-pointer hover:text-[#2D6A4F]">Kebijakan Privasi</button> Tunas
               </p>
             </div>
 
@@ -221,11 +253,11 @@ const RegisterPage = ({ onBack, onGoToLogin, onContinue, onRegisterSuccess }) =>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <button type="button" className="flex items-center justify-center gap-3 border border-gray-200 py-3 rounded-xl hover:bg-gray-50 transition-all text-xs font-bold text-gray-600">
+              <button type="button" onClick={handleGoogleLogin} className="flex items-center justify-center gap-3 border border-gray-200 py-3 rounded-xl hover:bg-gray-50 transition-all text-xs font-bold text-gray-600">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
                 Daftar dengan Google
               </button>
-              <button type="button" className="flex items-center justify-center gap-3 bg-[#1877F2] text-white py-3 rounded-xl hover:opacity-90 transition-all text-xs font-bold">
+              <button type="button" onClick={handleFacebookLogin} className="flex items-center justify-center gap-3 bg-[#1877F2] text-white py-3 rounded-xl hover:opacity-90 transition-all text-xs font-bold">
                 <span className="bg-white text-[#1877F2] rounded-full w-4 h-4 flex items-center justify-center text-[10px]">f</span>
                 Daftar dengan Facebook
               </button>
@@ -237,7 +269,7 @@ const RegisterPage = ({ onBack, onGoToLogin, onContinue, onRegisterSuccess }) =>
               Sudah punya akun? <span onClick={onGoToLogin} className="text-[#1A3022] font-bold cursor-pointer hover:underline">Masuk di sini</span>
             </p>
           </div>
-        </Reveal>
+        </div>
       </div>
     </div>
   );

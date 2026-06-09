@@ -91,8 +91,23 @@ export const api = {
       method: "POST",
       body: JSON.stringify(body),
     }),
+  forgotPassword: (email) =>
+    request("/api/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }),
+  resetPassword: (token, password) =>
+    request("/api/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify({ token, password }),
+    }),
   sendOtp: (phone, email, purpose = "register") =>
     request("/api/auth/otp/send", {
+      method: "POST",
+      body: JSON.stringify({ phone, email, purpose }),
+    }),
+  resendOtp: (phone, email, purpose = "register") =>
+    request("/api/auth/otp/resend", {
       method: "POST",
       body: JSON.stringify({ phone, email, purpose }),
     }),

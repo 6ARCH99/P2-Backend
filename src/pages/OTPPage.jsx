@@ -1,9 +1,13 @@
 import React, { useState, useRef } from 'react';
-import Reveal from '../components/motion/Reveal.jsx';
+import { api } from '../services/api.js';
 
-const OTPPage = ({ onBack, onVerifySuccess, phoneNumber = "+62 812-3456-789" }) => {
+const OTPPage = ({ onBack, onVerifySuccess, phoneNumber = "+62 812-3456-789", email = "" }) => {
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const inputRefs = useRef([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [resendTimer, setResendTimer] = useState(0);
+  const [resendLoading, setResendLoading] = useState(false);
 
   const handleChange = (element, index) => {
     if (isNaN(element.value)) return false;
@@ -25,14 +29,47 @@ const OTPPage = ({ onBack, onVerifySuccess, phoneNumber = "+62 812-3456-789" }) 
     }
   };
 
-  const handleVerify = (e) => {
+  const handleVerify = async (e) => {
     e.preventDefault();
+    setError('');
     const finalOtp = otp.join("");
-    if (finalOtp.length === 6) {
-      console.log("Memverifikasi OTP:", finalOtp);
-      onVerifySuccess(); // Logika jika verifikasi berhasil
-    } else {
-      alert("Masukkan 6 digit kode OTP");
+    if (finalOtp.length !== 6) {
+      setError('Masukkan 6 digit kode OTP');
+      return;
+    }
+    setLoading(true);
+    try {
+      const cleanPhone = phoneNumber.replace(/\s/g, '').replace(/\+62/, '0');
+      await api.verifyOtp(cleanPhone, finalOtp, 'register');
+      onVerifySuccess();
+    } catch (err) {
+      setError(err.message || 'Verifikasi OTP gagal. Silakan coba lagi.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (resendTimer > 0 || resendLoading) return;
+    setResendLoading(true);
+    setError('');
+    try {
+      const cleanPhone = phoneNumber.replace(/\s/g, '').replace(/\+62/, '0');
+      await api.resendOtp(cleanPhone, email, 'register');
+      setResendTimer(60);
+      const interval = setInterval(() => {
+        setResendTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err) {
+      setError(err.message || 'Gagal mengirim ulang OTP');
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -58,17 +95,17 @@ const OTPPage = ({ onBack, onVerifySuccess, phoneNumber = "+62 812-3456-789" }) 
       </nav>
 
       {/* Header Halaman */}
-      <Reveal className="text-center mt-12 mb-10">
+      <div className="text-center mt-12 mb-10">
         <span className="bg-[#D8E6DC] text-[#2D6A4F] text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest">
           Langkah 2 dari 2
         </span>
         <h1 className="text-5xl font-bold text-[#1A3022] mt-6 mb-4 font-heading leading-tight">Verifikasi OTP</h1>
         <p className="text-gray-500 text-sm">Kami telah mengirimkan kode 6 digit ke</p>
         <p className="font-bold text-[#1A3022] mt-1">{phoneNumber}</p>
-      </Reveal>
+      </div>
 
       <div className="max-w-2xl mx-auto px-6">
-        <Reveal variant="scale" delay={80} className="bg-white rounded-[40px] shadow-sm p-12 border border-gray-100 flex flex-col items-center card-interactive">
+        <div className="bg-white rounded-[40px] shadow-sm p-12 border border-gray-100 flex flex-col items-center card-interactive">
           
           <form onSubmit={handleVerify} className="w-full space-y-10">
             {/* Input OTP Row */}
@@ -87,9 +124,22 @@ const OTPPage = ({ onBack, onVerifySuccess, phoneNumber = "+62 812-3456-789" }) 
               ))}
             </div>
 
+            {error && (
+              <div className="text-center">
+                <p className="text-xs text-red-500">{error}</p>
+              </div>
+            )}
             <div className="text-center">
               <p className="text-xs text-gray-400">
-                Tidak menerima kode? <span className="text-[#1A3022] font-bold cursor-pointer hover:underline">Kirim ulang</span>
+                Tidak menerima kode?{' '}
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={resendTimer > 0 || resendLoading}
+                  className="text-[#1A3022] font-bold cursor-pointer hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {resendLoading ? 'Mengirim...' : resendTimer > 0 ? `Kirim ulang (${resendTimer}s)` : 'Kirim ulang'}
+                </button>
               </p>
             </div>
 
@@ -97,9 +147,10 @@ const OTPPage = ({ onBack, onVerifySuccess, phoneNumber = "+62 812-3456-789" }) 
             <div className="space-y-4 max-w-md mx-auto">
               <button 
                 type="submit"
-                className="w-full bg-[#1A3022] text-white py-5 rounded-2xl font-bold text-sm hover:opacity-95 transition-all shadow-lg active:scale-[0.98]"
+                disabled={loading}
+                className="w-full bg-[#1A3022] text-white py-5 rounded-2xl font-bold text-sm hover:opacity-95 transition-all shadow-lg active:scale-[0.98] disabled:opacity-60"
               >
-                Verifikasi
+                {loading ? 'Memverifikasi...' : 'Verifikasi'}
               </button>
               
               <button 
@@ -111,7 +162,7 @@ const OTPPage = ({ onBack, onVerifySuccess, phoneNumber = "+62 812-3456-789" }) 
               </button>
             </div>
           </form>
-        </Reveal>
+        </div>
       </div>
     </div>
   );
